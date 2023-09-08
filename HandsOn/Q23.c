@@ -1,4 +1,11 @@
-/*Write a program to create a Zombie state of the running program.*/
+/*
+ ============================================================================
+Name : Q23.c
+Author : Shivanirudh S G
+Description : Write a program to create a Zombie state of the running program.
+Date: 25th Aug 2023.
+============================================================================	
+*/
 
 #include<stdio.h>
 #include<stdlib.h>

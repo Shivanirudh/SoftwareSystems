@@ -1,4 +1,11 @@
-/*Write a program to run a script at a specific time using a Daemon process.*/
+/*
+ ============================================================================
+Name : Q30_check.c
+Author : Shivanirudh S G
+Description : Write a program to run a script at a specific time using a Daemon process.
+Date: 1st Sep 2023.
+============================================================================	
+*/
 
 #include<stdio.h>
 #include<unistd.h>

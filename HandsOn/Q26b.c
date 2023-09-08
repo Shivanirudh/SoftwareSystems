@@ -1,6 +1,12 @@
-/*Write a program to execute an executable program.
-a. use some executable program
-b. pass some input to an executable program. (for example execute an executable of $./a.out name)*/
+/*
+ ============================================================================
+Name : Q26b.c
+Author : Shivanirudh S G
+Description : Write a program to execute an executable program.
+b. pass some input to an executable program. (for example execute an executable of $./a.out name)
+Date: 1st Sep 2023.
+============================================================================	
+*/
 
 #include<stdio.h>
 #include<unistd.h>

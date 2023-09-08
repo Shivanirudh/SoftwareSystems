@@ -1,4 +1,12 @@
-/*Write a program to open an existing file with read write mode. Try O_EXCL flag also.*/
+/*
+ ============================================================================
+Name : Q4.c
+Author : Shivanirudh S G
+Description : Write a program to open an existing file with read write mode. Try O_EXCL flag also.
+Date: 11th Aug 2023.
+============================================================================	
+*/
+
 #include<stdio.h>
 #include<unistd.h>
 #include <sys/types.h>

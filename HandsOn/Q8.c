@@ -1,5 +1,11 @@
-/*Write a program to open a file in read only mode, read line by line and display each line as it is read.
-Close the file when end of file is reached.*/
+/*
+ ============================================================================
+Name : Q8.c
+Author : Shivanirudh S G
+Description : Write a program to open a file in read only mode, read line by line and display each line as it is read. Close the file when end of file is reached.
+Date: 18th Aug 2023.
+============================================================================	
+*/
 
 #include<stdio.h>
 #include<unistd.h>

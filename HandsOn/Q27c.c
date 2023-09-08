@@ -1,9 +1,12 @@
-/*Write a program to execute ls -Rl by the following system calls
-a. execl
-b. execlp
+/*
+ ============================================================================
+Name : Q27c.c
+Author : Shivanirudh S G
+Description : Write a program to execute ls -Rl by the following system calls
 c. execle
-d. execv
-e. execvp*/
+Date: 1st Sep 2023.
+============================================================================	
+*/
 
 #include<stdio.h>
 #include<unistd.h>

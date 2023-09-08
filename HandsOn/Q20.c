@@ -1,4 +1,11 @@
-/*Find out the priority of your running program. Modify the priority with nice command.*/
+/*
+ ============================================================================
+Name : Q20.c
+Author : Shivanirudh S G
+Description : Find out the priority of your running program. Modify the priority with nice command.
+Date: 25th Aug 2023.
+============================================================================	
+*/
 
 #include<stdio.h>
 #include<unistd.h>

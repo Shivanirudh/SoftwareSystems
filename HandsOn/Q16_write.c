@@ -1,6 +1,12 @@
-/*Write a program to perform mandatory locking.
-a. Implement write lock
-b. Implement read lock*/
+/*
+ ============================================================================
+Name : Q16_write.c
+Author : Shivanirudh S G
+Description : Write a program to perform mandatory locking.
+			a. Implement write lock
+Date: 23rd Aug 2023.
+============================================================================	
+*/
 
 #include<stdio.h>
 #include<unistd.h>

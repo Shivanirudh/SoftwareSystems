@@ -1,4 +1,11 @@
-/*Write a program to get maximum and minimum real time priority.*/
+/*
+ ============================================================================
+Name : Q28.c
+Author : Shivanirudh S G
+Description : Write a program to get maximum and minimum real time priority.
+Date: 1st Sep 2023.
+============================================================================	
+*/
 
 #include<stdio.h>
 #include<unistd.h>

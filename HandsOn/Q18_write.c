@@ -1,7 +1,13 @@
-/*Write a program to perform Record locking.
-a. Implement write lock
-b. Implement read lock
-Create three records in a file. Whenever you access a particular record, first lock it then modify/access to avoid race condition.*/
+/*
+ ============================================================================
+Name : Q18_write.c
+Author : Shivanirudh S G
+Description : Write a program to perform Record locking.
+			a. Implement write lock
+Create three records in a file. Whenever you access a particular record, first lock it then modify/access to avoid race condition.
+Date: 23rd Aug 2023.
+============================================================================	
+*/
 
 #include<stdio.h>
 #include<unistd.h>

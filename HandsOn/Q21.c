@@ -1,4 +1,11 @@
-/*Write a program, call fork and print the parent and child process id.*/
+/*
+ ============================================================================
+Name : Q21.c
+Author : Shivanirudh S G
+Description : Write a program, call fork and print the parent and child process id.
+Date: 25th Aug 2023.
+============================================================================	
+*/
 
 #include<stdio.h>
 #include<unistd.h>
