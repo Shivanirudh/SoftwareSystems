@@ -1,4 +1,4 @@
-/*Write a program to create a message queue and print the key and message queue id.*/
+/*Write a program to send messages to the message queue. Check $ipcs -q*/
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -12,7 +12,13 @@
 #include<sys/ipc.h>
 #include<sys/msg.h>
 
+struct msgQ{
+	long mtype;
+	char mtxt[1024];
+};
+
 int main(){
+	struct msgQ mq;
 	int key = ftok(".", 'a');
 	int msgQID = msgget(key, IPC_CREAT|0666);
 	
@@ -21,6 +27,9 @@ int main(){
 	}
 	else{
 		printf("Creation success. MSG Q ID: %d\n", msgQID);
+		mq.mtype = 1;
+		strcpy(mq.mtxt,"MQ msg");
+		msgsnd(msgQID, &mq, sizeof(mq), 0);
 	}
 	
 	return 0;
