@@ -18,8 +18,9 @@ c. protect multiple pseudo resources ( may be two) using counting semaphore
 
 union semun{
 	int val;
-	struct semid_ds buf;
+	struct semid_ds *buf;
 	unsigned short int *array;
+	struct seminfo  *__buf;
 };
 
 int main(){
@@ -33,7 +34,8 @@ int main(){
 		printf("Creation success. Semaphore ID: %d\n", semID);
 		union semun arg;
 		arg.val = 3;
-		semctl(semID, 0, SETVAL, arg);		
+		if(semctl(semID, 0, SETVAL, arg)<0)
+			printf("Error setting value\n");	
 	}
 	
 	return 0;
