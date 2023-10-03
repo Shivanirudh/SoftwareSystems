@@ -1,8 +1,12 @@
-/*
-Write a program to create a concurrent server.
-use pthread_create
+/* 
+ ============================================================================
+Name : Q34b_server.c
+Author : Shivanirudh S G
+Description : Write a program to communicate between two machines using socket.
+			b. use pthread_create
+Date: 1st Oct 2023.
+============================================================================
 */
-
 
 #include<stdio.h>
 #include<stdlib.h>

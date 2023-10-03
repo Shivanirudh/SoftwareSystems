@@ -1,4 +1,11 @@
-/*Write two programs so that both can communicate by FIFO -Use one way communication.*/
+/*
+ ============================================================================
+Name : Q21_write.c
+Author : Shivanirudh S G
+Description : Write two programs so that both can communicate by FIFO -Use two way communications.
+Date: 19th Sep 2023.
+============================================================================
+*/
 
 #include<stdio.h>
 #include<stdlib.h>

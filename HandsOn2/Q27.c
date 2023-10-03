@@ -1,6 +1,13 @@
-/*Write a program to receive messages from the message queue.
-a. with 0 as a flag
-b. with IPC_NOWAIT as a flag*/
+/*
+ ============================================================================
+Name : Q27.c
+Author : Shivanirudh S G
+Description : Write a program to receive messages from the message queue.
+			a. with 0 as a flag
+			b. with IPC_NOWAIT as a flag
+Date: 19th Sep 2023.
+============================================================================
+*/
 
 #include<stdio.h>
 #include<stdlib.h>

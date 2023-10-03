@@ -1,8 +1,12 @@
-/*
-Write a program to communicate between two machines using socket.
-a. use fork
+/* 
+ ============================================================================
+Name : Q34a_client.c
+Author : Shivanirudh S G
+Description : Write a program to communicate between two machines using socket.
+			a. use fork
+Date: 1st Oct 2023.
+============================================================================
 */
-
 
 #include<stdio.h>
 #include<stdlib.h>

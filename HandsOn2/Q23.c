@@ -1,5 +1,11 @@
-/*Write a program to print the maximum number of files can be opened within a process and
-size of a pipe (circular buffer).*/
+/*
+ ============================================================================
+Name : Q23.c
+Author : Shivanirudh S G
+Description : Write a program to print the maximum number of files can be opened within a process and size of a pipe (circular buffer).
+Date: 19th Sep 2023.
+============================================================================
+*/
 
 #include<stdio.h>
 #include<stdlib.h>

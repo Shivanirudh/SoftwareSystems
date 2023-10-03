@@ -1,7 +1,12 @@
-/*Write a program to execute ls -l | wc.
-a. use dup
-b. use dup2
-c. use fcntl*/
+/*
+ ============================================================================
+Name : Q17b.c
+Author : Shivanirudh S G
+Description : Write a program to execute ls -l | wc.
+			b. use dup2
+Date: 5th Sep 2023.
+============================================================================
+*/
 
 #include<stdio.h>
 #include<stdlib.h>

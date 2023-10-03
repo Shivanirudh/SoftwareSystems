@@ -1,4 +1,11 @@
-/*Write a program to create a message queue and print the key and message queue id.*/
+/*
+ ============================================================================
+Name : Q24.c
+Author : Shivanirudh S G
+Description : Write a program to create a message queue and print the key and message queue id.
+Date: 19th Sep 2023.
+============================================================================
+*/
 
 #include<stdio.h>
 #include<stdlib.h>

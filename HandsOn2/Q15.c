@@ -1,4 +1,11 @@
-/*Write a simple program to send some data from parent to the child process.*/
+/*
+ ============================================================================
+Name : Q15.c
+Author : Shivanirudh S G
+Description : Write a simple program to send some data from parent to the child process.
+Date: 1st Sep 2023.
+============================================================================
+*/
 
 #include<stdio.h>
 #include<stdlib.h>

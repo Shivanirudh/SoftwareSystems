@@ -1,5 +1,12 @@
-/*Write a program to send and receive data from parent to child vice versa. Use two way
-communication.*/
+/*
+ ============================================================================
+Name : Q16.c
+Author : Shivanirudh S G
+Description : Write a program to send and receive data from parent to child vice versa. Use two way
+communication.
+Date: 1st Sep 2023.
+============================================================================
+*/
 
 #include<stdio.h>
 #include<stdlib.h>

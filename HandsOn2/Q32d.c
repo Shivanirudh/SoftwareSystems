@@ -1,8 +1,12 @@
-/*
-Write a program to implement semaphore to protect any critical section.
-d. remove the created semaphore
+/* 
+ ============================================================================
+Name : Q32d.c
+Author : Shivanirudh S G
+Description : Write a program to implement semaphore to protect any critical section.
+			d. remove the created semaphore
+Date: 19th Sep 2023.
+============================================================================
 */
-
 
 #include<stdio.h>
 #include<stdlib.h>

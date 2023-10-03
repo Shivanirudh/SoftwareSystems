@@ -1,6 +1,11 @@
 /*
-Write a program to implement semaphore to protect any critical section.
-a. rewrite the ticket number creation program using semaphore
+ ============================================================================
+Name : Q32a_book_ticket.c
+Author : Shivanirudh S G
+Description : Write a program to implement semaphore to protect any critical section.
+			a. rewrite the ticket number creation program using semaphore
+Date: 19th Sep 2023.
+============================================================================
 */
 
 #include<stdio.h>

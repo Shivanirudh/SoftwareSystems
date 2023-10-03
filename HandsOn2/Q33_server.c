@@ -1,5 +1,10 @@
-/*
-Write a program to communicate between two machines using socket.
+/* 
+ ============================================================================
+Name : Q33_server.c
+Author : Shivanirudh S G
+Description : Write a program to communicate between two machines using socket.
+Date: 1st Oct 2023.
+============================================================================
 */
 
 

@@ -1,6 +1,11 @@
 /*
-Write a program to implement semaphore to protect any critical section.
-b. protect shared memory from concurrent write access
+ ============================================================================
+Name : Q32b_write.c
+Author : Shivanirudh S G
+Description : Write a program to implement semaphore to protect any critical section.
+			b. protect shared memory from concurrent write access
+Date: 19th Sep 2023.
+============================================================================
 */
 
 #include<stdio.h>

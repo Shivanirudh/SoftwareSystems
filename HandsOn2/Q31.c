@@ -1,6 +1,13 @@
-/*Write a program to create a semaphore and initialize value to the semaphore.
-a. create a binary semaphore
-b. create a counting semaphore*/
+/*
+ ============================================================================
+Name : Q31.c
+Author : Shivanirudh S G
+Description : Write a program to create a semaphore and initialize value to the semaphore.
+			a. create a binary semaphore
+			b. create a counting semaphore
+Date: 19th Sep 2023.
+============================================================================
+*/
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -18,6 +25,7 @@ union semun{
 	int val;
 	struct semid_ds buf;
 	unsigned short int *array;
+	struct seminfo  *__buf;
 };
 
 int main(){

@@ -1,8 +1,12 @@
 /*
-Write a program to implement semaphore to protect any critical section.
-c. protect multiple pseudo resources ( may be two) using counting semaphore
+ ============================================================================
+Name : Q32c.c
+Author : Shivanirudh S G
+Description : Write a program to implement semaphore to protect any critical section.
+			c. protect multiple pseudo resources ( may be two) using counting semaphore
+Date: 19th Sep 2023.
+============================================================================
 */
-
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -20,6 +24,7 @@ union semun{
 	int val;
 	struct semid_ds buf;
 	unsigned short int *array;
+	struct seminfo  *__buf;
 };
 
 int main(int argc, char* argv[]){

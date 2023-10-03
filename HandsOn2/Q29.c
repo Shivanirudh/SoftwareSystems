@@ -1,4 +1,11 @@
-/*Write a program to remove the message queue.*/
+/*
+ ============================================================================
+Name : Q29.c
+Author : Shivanirudh S G
+Description : Write a program to remove the message queue.
+Date: 19th Sep 2023.
+============================================================================
+*/
 
 #include<stdio.h>
 #include<stdlib.h>

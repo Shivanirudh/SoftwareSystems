@@ -1,5 +1,13 @@
-/*Write a program to wait for data to be written into FIFO within 10 seconds, use select
-system call with FIFO.*/
+/*
+ ============================================================================
+Name : Q22.c
+Author : Shivanirudh S G
+Description : Write a program to wait for data to be written into FIFO within 10 seconds, use select
+system call with FIFO.
+Date: 19th Sep 2023.
+============================================================================
+*/
+
 #include<stdio.h>
 #include<unistd.h>
 #include <sys/types.h>

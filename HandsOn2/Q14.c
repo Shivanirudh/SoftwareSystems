@@ -1,5 +1,11 @@
-/*Write a simple program to create a pipe, write to the pipe, read from pipe and display on
-the monitor.*/
+/*
+ ============================================================================
+Name : Q14.c
+Author : Shivanirudh S G
+Description : Write a simple program to create a pipe, write to the pipe, read from pipe and display on the monitor.
+Date: 1st Sep 2023.
+============================================================================
+*/
 
 #include<stdio.h>
 #include<stdlib.h>

@@ -1,6 +1,11 @@
 /*
-Write a program to implement semaphore to protect any critical section.
-c. protect multiple pseudo resources ( may be two) using counting semaphore
+ ============================================================================
+Name : Q32c_create.c
+Author : Shivanirudh S G
+Description : Write a program to implement semaphore to protect any critical section.
+			c. protect multiple pseudo resources ( may be two) using counting semaphore
+Date: 19th Sep 2023.
+============================================================================
 */
 
 

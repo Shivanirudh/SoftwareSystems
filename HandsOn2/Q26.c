@@ -1,4 +1,11 @@
-/*Write a program to send messages to the message queue. Check $ipcs -q*/
+/*
+ ============================================================================
+Name : Q26.c
+Author : Shivanirudh S G
+Description : Write a program to send messages to the message queue. Check $ipcs -q
+Date: 19th Sep 2023.
+============================================================================
+*/
 
 #include<stdio.h>
 #include<stdlib.h>
