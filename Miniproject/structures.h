@@ -13,6 +13,7 @@
 #include<netinet/in.h>
 #include<arpa/inet.h>
 #include<pthread.h>
+#include<stdbool.h>
 
 #define delimiter1 "-----------------------------------------"
 #define delimiter2 "_____________________________________________________________________"
@@ -33,56 +34,83 @@ typedef struct Admin{
 } Admin;
 
 typedef struct Course{
-	char code[4];
+	int code;
 	char name[50];
 	char department[50];
 	char faculty_name[30];
+	int credits;
+	int total_seat_count;
+	int available_seat_count;
+	bool active;
 } Course;
 
 typedef struct Student{
-	char ID[4];
+	int ID;
 	char name[50];
 	char email[50];
 	int age;
 	char password[30];
 	bool activated;
 	bool blocked;
+	bool active;
 } Student;
 
 typedef struct Faculty{
-	char ID[4];
+	int ID;
 	char name[50];
 	char email[50];
 	char password[30];
 	bool activated;
+	bool active;
 } Faculty;
+
+typedef struct Enrollment{
+	Student s;
+	Course c;
+	bool active;
+} Enrollment;
 
 Student inputStudent(){
 	Student s;
-	printf("Enter name: ");scanf(" %[^\n]", &s.name);
-	printf("Enter email ID: ");scanf(" %[^\n]", &s.email);
+	printf("Enter name: ");scanf(" %[^\n]", s.name);
+	printf("Enter email ID: ");scanf(" %[^\n]", s.email);
 	printf("Enter age: ");scanf("%d", &s.age);
 	s.activated = false;
 	s.blocked = false;
+	s.active = true;
 	
 	return s;
 }
 
 Faculty inputFaculty(){
 	Faculty f;
-	printf("Enter name: ");scanf(" %[^\n]", &f.name);
-	printf("Enter email ID: ");scanf(" %[^\n]", &f.email);
+	printf("Enter name: ");scanf(" %[^\n]", f.name);
+	printf("Enter email ID: ");scanf(" %[^\n]", f.email);
 	f.activated = false;
+	f.active = true;
 	
 	return f;
 }
 
 Course inputCourse(){
 	Course c;
-	printf("Enter course name: ");scanf(" %[^\n]", &c.name);
-	printf("Enter department: ");scanf(" %[^\n]", &c.department);
+	printf("Enter course name: ");scanf(" %[^\n]", c.name);
+	printf("Enter department: ");scanf(" %[^\n]", c.department);
+	printf("Enter number of credits: ");scanf(" %d", &c.credits);
+	printf("Enter number of seats: ");scanf(" %d", &c.total_seat_count);
+	c.available_seat_count = c.total_seat_count;
+	c.active = true;
 	
 	return c;
+}
+
+Enrollment createEnrollment(Student s, Course c){
+	Enrollment e;
+	e.s = s;
+	e.c = c;
+	e.active = true;
+	
+	return e;
 }
 
 void printStudent(Student s){
@@ -99,17 +127,21 @@ void printFaculty(Faculty f){
 }
 
 void printCourse(Course c){
-	printf("Course code: %s\n", c.code);
+	printf("Course code: %d\n", c.code);
 	printf("Course name: %s\n", c.name);
 	printf("Offered by: %s\n", c.department);
 	printf("Handled by: Prof. %s\n", c.faculty_name);
+	printf("Number of credits: %d\n", c.credits);
+	printf("Total seats: %d\n", c.total_seat_count);
+	printf("Available seats: %d\n", c.available_seat_count);
 	printf("%s\n", delimiter1);
 }
-
+/*
 int admin_fd = open(admin_file, O_RDWR|O_CREAT, S_IRWXU);
 int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 int course_fd = open(course_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 int student_course_fd = open(student_course_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
+*/
 
 

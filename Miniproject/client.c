@@ -1,4 +1,4 @@
-
+#include "student_ops.h"
 
 int main(){
 	struct sockaddr_in serv, cli;
@@ -13,22 +13,48 @@ int main(){
 	
 	serv.sin_family = AF_INET;
 	serv.sin_addr.s_addr = inet_addr("127.0.0.1");
-	serv.sin_port = htons(7229);
+	serv.sin_port = htons(PORT_NO);
 	
 	if(connect(sd, (struct sockaddr*) &serv, sizeof(serv)) < 0)
 		printf("Unable to connect to server\n");
 	else
 		printf("Connected to server. \n");
 	
-	char buf[1024];
-	int len = sizeof(cli);
-	while(strcmp(buf, "end") != 0){
+	//char buf[1024];
+	//int len = sizeof(cli);
+	while(1){
+		
+		int role[2] = mainMenu();
+		if(role[0] == -2){
+			printf("Invalid Credentials!!!\n");
+			continue;
+		}
+		else if(role[0] == -1){
+			printf("That login ID does not exist for that role. \n");
+			continue;
+		}
+		else if(role[0] == 0){
+			break;
+		}
+		else if(role[0] == 1){
+			Admin a = getAdmin();
+			adminDriver(a);
+		}
+		else if(role[0] == 2){
+			Faculty f = getFaculty(role[1]);
+			facultyDriver(f);
+		}
+		else if(role[0] == 3){
+			Student s = getStudent(role[1]);
+			studentDriver(s);
+		}
+		/*
 		bzero(&buf, sizeof(buf));
 		read(sd, buf, sizeof(buf));
 		printf("Message from server: %s\n", buf);
 		bzero(buf, sizeof(buf));
 		printf("\nEnter the message: ");scanf(" %[^\n]", buf);
-		write(sd, buf, sizeof(buf));
+		write(sd, buf, sizeof(buf));*/
 	}
 	
 	close(sd);

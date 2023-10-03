@@ -1,18 +1,4 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<sys/types.h>
-#include<sys/stat.h>
-#include<fcntl.h>
-#include<string.h>
-#include<sys/time.h>
-#include<sys/resource.h>
-#include<sys/ipc.h>
-#include<sys/sem.h>
-#include<sys/socket.h>
-#include<netinet/in.h>
-#include<arpa/inet.h>
-#include<pthread.h>
+#include "student_ops.h"
 
 struct param{
 	int csd; 
@@ -30,14 +16,16 @@ void *update(void *parameters){
 	struct param *params = (struct param *) parameters;
 	read(params->csd, params->buf, sizeof(params->buf));
 	//Check end of connection
-	if(strcmp(params->buf, "end") == 0){
+	if(strcmp(params->buf, "exit") == 0){
 		getpeername(params->csd, (struct sockaddr*)&params->cli,&params->len);
-		printf("\nHost disconnected. Socket: %d.\n",params->client_sockets[params->ix]);
+		printf("\nClient disconnected. Socket: %d.\n",params->client_sockets[params->ix]);
 		close(params->csd);
 		params->client_sockets[params->ix] = 0;
 		params->cnt--;
 	}
 	else{
+		int role = mainMenu();
+		
 		printf("\nMessage from Client %d: %s\n", params->client_sockets[params->ix], params->buf);
 		
 		bzero(params->buf, sizeof(params->buf));
@@ -76,7 +64,8 @@ int main(){
 	
 	if(bind(sd, (struct sockaddr*)&serv, sizeof(serv)) < 0)
 		perror("Bind error\n");
-	listen(sd, 5);
+	listen(sd, 10);
+	printf("Server: Socket created. Listening....\n");
 	
 	int len = sizeof(cli);
 	int cnt = 0;
@@ -106,9 +95,9 @@ int main(){
 			cnt++;
 			printf("Client no. %d --- %s : %d connected\n", cnt, inet_ntoa(cli.sin_addr), ntohs(cli.sin_port));
 			
-			printf("Number of active connections: %d\n", cnt);
-			strcpy(buf, "Connection established");
-			write(new_fd, buf, sizeof(buf));
+			//printf("Number of active connections: %d\n", cnt);
+			//strcpy(buf, "Connection established");
+			//write(new_fd, buf, sizeof(buf));
 			
 			for(int i =0;i<30;i++){
 				if(client_sockets[i] == 0){
@@ -137,25 +126,6 @@ int main(){
 				pthread_t process;
 				pthread_create(&process, NULL, update, &param_array[t]);
 				
-				/*if(!fork()){
-					read(csd, buf, sizeof(buf));
-					//Check end of connection
-					if(strcmp(buf, "end") == 0){
-						getpeername(csd, (struct sockaddr*)&cli,&len);
-						printf("\nHost disconnected. Socket: %d.\n",client_sockets[i]);
-						close(csd);
-						client_sockets[i] = 0;
-						cnt--;
-					}
-					else{
-						printf("\nMessage from Client %d: %s\n", client_sockets[i], buf);
-						
-						bzero(buf, sizeof(buf));
-						//Write message in buffer
-						printf("\nEnter message: ");scanf(" %[^\n]", buf);
-						write(new_fd, buf, sizeof(buf));
-					}
-				}*/
 				pthread_join(process, NULL);
 			}
 		}
