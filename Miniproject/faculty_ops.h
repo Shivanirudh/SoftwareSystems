@@ -135,19 +135,23 @@ void facultyDriver(Faculty f){
 		
 		if(opt == 0) break;
 		else if(opt == 1){
+			printf("\n\n");
 			addCourse(f.name);
 			printf("\n\n");
 		}
 		else if(opt == 2){
+			printf("\n\n");
 			viewEnrollments(f.name);
 			printf("\n\n");
 		}
 		else if(opt == 3){
 			printf("Enter code: ");scanf("%d", &code);
+			printf("\n\n");
 			removeCourse(code);
 			printf("\n\n");
 		}
 		else if(opt == 4){
+			printf("\n\n");
 			passwordChange(1);
 			printf("\n\n");
 		}
@@ -158,7 +162,7 @@ void facultyDriver(Faculty f){
 }
 
 //Testing driver code
-
+/*
 int main(){
 	int opt = -1;
 	while(1){
@@ -191,4 +195,4 @@ int main(){
 		}
 	}
 }
-
+*/

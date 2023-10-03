@@ -187,7 +187,7 @@ void unenrollCourse(Student s){
 	close(student_course_fd);
 }
 
-void passwordChange(int ID){
+void passwordChangeStudent(int ID){
 	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Student tmp;
 	
@@ -231,19 +231,23 @@ void studentDriver(Student s){
 		
 		if(opt == 0) break;
 		else if(opt == 1){
+			printf("\n\n");
 			enrollCourse(s);
 			printf("\n\n");
 		}
 		else if(opt == 2){
+			printf("\n\n");
 			unenrollCourse(s);
 			printf("\n\n");
 		}
 		else if(opt == 3){
+			printf("\n\n");
 			viewEnrolledCourses(s);
 			printf("\n\n");
 		}
 		else if(opt == 4){
-			passwordChange(s.ID);
+			printf("\n\n");
+			passwordChangeStudent(s.ID);
 			printf("\n\n");
 		}
 		else{
@@ -253,7 +257,7 @@ void studentDriver(Student s){
 }
 
 //Testing driver code
-
+/*
 int main(){
 	int opt = -1;
 	while(1){
@@ -285,4 +289,5 @@ int main(){
 		}
 	}
 }
+*/
 

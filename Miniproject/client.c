@@ -20,11 +20,19 @@ int main(){
 	else
 		printf("Connected to server. \n");
 	
-	//char buf[1024];
+	char buf[1024];
 	//int len = sizeof(cli);
 	while(1){
 		
 		int role[2] = mainMenu();
+		write(sd, role, sizeof(role));
+		
+		
+		bzero(&buf, sizeof(buf));
+		read(sd, buf, sizeof(buf));
+		if(strcmp(buf, "exit") == 0)
+			break;
+		printf("%s\n", buf);
 		if(role[0] == -2){
 			printf("Invalid Credentials!!!\n");
 			continue;
@@ -37,15 +45,21 @@ int main(){
 			break;
 		}
 		else if(role[0] == 1){
-			Admin a = getAdmin();
+			//Admin a = getAdmin();
+			Admin a;
+			read(sd, (void*) &a, sizeof(a));
 			adminDriver(a);
 		}
 		else if(role[0] == 2){
-			Faculty f = getFaculty(role[1]);
+			//Faculty f = getFaculty(role[1]);
+			Faculty f;
+			read(sd, (void*) &f, sizeof(f));
 			facultyDriver(f);
 		}
 		else if(role[0] == 3){
-			Student s = getStudent(role[1]);
+			//Student s = getStudent(role[1]);
+			Student s;
+			read(sd, (void*) &s, sizeof(s));
 			studentDriver(s);
 		}
 		/*

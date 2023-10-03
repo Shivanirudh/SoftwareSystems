@@ -363,7 +363,7 @@ void adminDriver(Admin a){
 }
 
 //Testing driver code
-
+/*
 int main(){
 	int opt = -1;
 	while(1){
@@ -419,5 +419,5 @@ int main(){
 			printf("Invalid option\n");
 		}
 	}
-}
+}*/
 

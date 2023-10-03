@@ -85,6 +85,13 @@ Course getCourse(int code){
 	return tmp;
 }
 
+char* mystrncpy(char login[20], int offset){
+	char *s = calloc(20, sizeof(char));
+	for(int i=offset;login[i];i++)
+		s[i-offset] = login[i];
+	return s;
+}
+
 int checkUser(int role, char login[20]){
 	if(role == 1){
 		int admin_fd = open(admin_file, O_RDWR|O_CREAT, S_IRWXU);
@@ -97,20 +104,24 @@ int checkUser(int role, char login[20]){
 		close(admin_fd);
 	}
 	else if(role == 2){
+		char *s = mystrncpy(login, 4); 
+		int loginID = atoi(s);
 		int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 		Faculty tmp;
 		while(read(faculty_fd, &tmp, sizeof(tmp)))
-			if(strcmp(login, tmp.ID) == 0 && tmp.active){
+			if(loginID == tmp.ID && tmp.active){
 				close(faculty_fd);
 				return role;
 			}
 		close(faculty_fd);
 	}
 	else{
+		char *s = mystrncpy(login, 2); 
+		int loginID = atoi(s);
 		int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 		Student tmp;
 		while(read(student_fd, &tmp, sizeof(tmp)))
-			if(strcmp(login, tmp.ID) == 0 && tmp.active){
+			if(loginID == tmp.ID && tmp.active){
 				close(student_fd);
 				return role;
 			}
@@ -119,26 +130,21 @@ int checkUser(int role, char login[20]){
 	return -1;
 }
 
-char[] mystrncpy(char login[20], int offset){
-	char s[20];
-	for(int i=offset;login[i];i++)
-		s[i-offset] = login[i];
-	return s;
-}
-
-int[] validateCreds(int role, char login[20], char password[30]){
+int* validateCreds(int role, char login[20], char password[30]){
 	if(role == 1){
 		int admin_fd = open(admin_file, O_RDWR|O_CREAT, S_IRWXU);
 		Admin a;
 		read(admin_fd, &a, sizeof(a));
-		if(strcmp(login, a.ID) == 0 and strcmp(password, a.password) == 0){
+		if(strcmp(login, a.ID) == 0 && strcmp(password, a.password) == 0){
 			close(admin_fd);
-			return {role, 0};
+			int *arr = calloc(2, sizeof(int));
+			arr[0] = role; arr[1] = 0;
+			return arr;
 		}
 		close(admin_fd);
 	}
 	else if(role == 2){
-		char s[] = mystrncpy(login, 4); 
+		char *s = mystrncpy(login, 4); 
 		int loginID = atoi(s);
 		
 		int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
@@ -146,28 +152,34 @@ int[] validateCreds(int role, char login[20], char password[30]){
 		while(read(faculty_fd, &tmp, sizeof(tmp)))
 			if(loginID == tmp.ID && strcmp(password, tmp.password) == 0 && tmp.active){
 				close(faculty_fd);
-				return {role, loginID};
+				int *arr = calloc(2, sizeof(int));
+				arr[0] = role; arr[1] = loginID;
+				return arr;	
 			}
 		close(faculty_fd);
 	}
 	else{
-		char s[] = mystrncpy(login, 2); 
+		char *s = mystrncpy(login, 2); 
 		int loginID = atoi(s);
 		
 		int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 		Student tmp;
 		while(read(student_fd, &tmp, sizeof(tmp)))
-			if(login == tmp.ID && strcmp(password, tmp.password) == 0 && tmp.active){
+			if(loginID == tmp.ID && strcmp(password, tmp.password) == 0 && tmp.active){
 				close(student_fd);
-				return {role, loginID};
+				int *arr = calloc(2, sizeof(int));
+				arr[0] = role; arr[1] = loginID;
+				return arr;	
 			}
 		close(student_fd);
 	}
-	return {-2, 0};
+	int *arr = calloc(2, sizeof(int));
+	arr[0] = -2; arr[1] = 0;
+	return arr;
 }
 
-int[] mainMenu(){
-	clrscr();
+int* mainMenu(){
+	//clrscr();
 	int role;
 	printf("%s\n", delimiter2);
 	printf("%s\n", delimiter2);
@@ -178,20 +190,25 @@ int[] mainMenu(){
 	printf("1. Admin \n");
 	printf("2. Faculty \n");
 	printf("3. Student \n");
-	printf("0. Exit \n")
+	printf("0. Exit \n");
 	do{
 		printf("Enter choice: "); scanf("%d", &role);
 		if(role != 0 || role != 1 || role != 2 || role != 3) printf("Invalid choice. \n");
 	}while(role != 0 || role != 1 || role != 2 || role != 3);
 	
-	if(role == 0) return {0, 0};
+	if(role == 0){ 
+		int *arr = calloc(2, sizeof(int));
+		arr[0] = 0; arr[1] = 0;
+		return arr;
+	}
 	
 	char login[20], password[30];
 	printf("Enter login ID: "); scanf(" %[^\n]", login);
 	int flag = checkUser(role, login);
 	if(flag == -1){
-		int roles = {flag, 0};
-		return roles;
+		int *arr = calloc(2, sizeof(int));
+		arr[0] = flag; arr[1] = 0;
+		return arr;
 	}
 	printf("Enter password: "); 
 	char ch = 'a';int ix = 0;

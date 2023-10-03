@@ -24,7 +24,46 @@ void *update(void *parameters){
 		params->cnt--;
 	}
 	else{
-		int role = mainMenu();
+		int role[2];
+		read(params->new_fd, role, sizeof(role));
+		
+		if(role[0] == -2){
+			printf("Invalid Credentials!!!\n");
+			strcpy(params->buf, "Invalid Credentials!!!\n");
+			write(params->new_fd, params->buf, sizeof(params->buf));
+			return;
+		}
+		else if(role[0] == -1){
+			printf("That login ID does not exist for that role. \n");
+			strcpy(params->buf, "That login ID does not exist for that role. \n");
+			write(params->new_fd, params->buf, sizeof(params->buf));
+			return;
+		}
+		else if(role[0] == 0){
+			strcpy(params->buf, "exit");
+			write(params->new_fd, params->buf, sizeof(params->buf));
+		}
+		else if(role[0] == 1){
+			strcpy(params->buf, "Logged in as Admin \n");
+			write(params->new_fd, params->buf, sizeof(params->buf));
+			Admin a = getAdmin();
+			write(params->new_fd, (void*) &a, sizeof(a));
+			//adminDriver(a);
+		}
+		else if(role[0] == 2){
+			strcpy(params->buf, "Logged in as Faculty \n");
+			write(params->new_fd, params->buf, sizeof(params->buf));
+			Faculty f = getFaculty(role[1]);
+			write(params->new_fd, (void*) &f, sizeof(f));
+			//facultyDriver(f);
+		}
+		else if(role[0] == 3){
+			strcpy(params->buf, "Logged in as Student \n");
+			write(params->new_fd, params->buf, sizeof(params->buf));
+			Student s = getStudent(role[1]);
+			write(params->new_fd, (void*) &s, sizeof(s));
+			//studentDriver(s);
+		}
 		
 		printf("\nMessage from Client %d: %s\n", params->client_sockets[params->ix], params->buf);
 		
@@ -58,7 +97,7 @@ int main(){
 	
 	serv.sin_family = AF_INET;
 	serv.sin_addr.s_addr = INADDR_ANY;
-	serv.sin_port = htons(7229);
+	serv.sin_port = htons(PORT_NO);
 	
 	
 	
