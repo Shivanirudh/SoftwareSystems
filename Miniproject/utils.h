@@ -10,6 +10,28 @@ struct flock getLock(short l_type, short l_whence, off_t l_start, off_t l_len){
 	return mylock;
 }
 
+ssize_t my_getpass (char **lineptr, size_t *n, FILE *stream)
+{
+  struct termios old, new;
+  int nread;
+
+  /* Turn echoing off and fail if we can’t. */
+  if (tcgetattr (fileno (stream), &old) != 0)
+    return -1;
+  new = old;
+  new.c_lflag &= ~ECHO;
+  if (tcsetattr (fileno (stream), TCSAFLUSH, &new) != 0)
+    return -1;
+
+  /* Read the passphrase */
+  nread = getline (lineptr, n, stream);
+
+  /* Restore terminal. */
+  (void) tcsetattr (fileno (stream), TCSAFLUSH, &old);
+
+  return nread;
+}
+
 Admin getAdmin(){
 	int admin_fd = open(admin_file, O_RDWR|O_CREAT, S_IRWXU);
 	Admin a;
@@ -93,6 +115,7 @@ char* mystrncpy(char login[20], int offset){
 }
 
 int checkUser(int role, char login[20]){
+	printf("Check: %d %s\n", role, login);
 	if(role == 1){
 		int admin_fd = open(admin_file, O_RDWR|O_CREAT, S_IRWXU);
 		Admin a;
@@ -106,6 +129,7 @@ int checkUser(int role, char login[20]){
 	else if(role == 2){
 		char *s = mystrncpy(login, 4); 
 		int loginID = atoi(s);
+		printf("LoginID: %d\n", loginID);
 		int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 		Faculty tmp;
 		while(read(faculty_fd, &tmp, sizeof(tmp)))
@@ -118,6 +142,7 @@ int checkUser(int role, char login[20]){
 	else{
 		char *s = mystrncpy(login, 2); 
 		int loginID = atoi(s);
+		printf("LoginID: %d\n", loginID);
 		int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 		Student tmp;
 		while(read(student_fd, &tmp, sizeof(tmp)))
@@ -131,7 +156,9 @@ int checkUser(int role, char login[20]){
 }
 
 int* validateCreds(int role, char login[20], char password[30]){
+	printf("Validate: %d %s %s\n", role, login, password);
 	if(role == 1){
+		printf("admin\n");
 		int admin_fd = open(admin_file, O_RDWR|O_CREAT, S_IRWXU);
 		Admin a;
 		read(admin_fd, &a, sizeof(a));
@@ -144,21 +171,25 @@ int* validateCreds(int role, char login[20], char password[30]){
 		close(admin_fd);
 	}
 	else if(role == 2){
+		printf("faculty\n");
 		char *s = mystrncpy(login, 4); 
 		int loginID = atoi(s);
 		
 		int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 		Faculty tmp;
-		while(read(faculty_fd, &tmp, sizeof(tmp)))
+		while(read(faculty_fd, &tmp, sizeof(tmp))){
+			printf("Faculty password: %s %s \n", password, tmp.password);
 			if(loginID == tmp.ID && strcmp(password, tmp.password) == 0 && tmp.active){
 				close(faculty_fd);
 				int *arr = calloc(2, sizeof(int));
 				arr[0] = role; arr[1] = loginID;
 				return arr;	
 			}
+		}
 		close(faculty_fd);
 	}
 	else{
+		printf("student\n");
 		char *s = mystrncpy(login, 2); 
 		int loginID = atoi(s);
 		
@@ -193,8 +224,8 @@ int* mainMenu(){
 	printf("0. Exit \n");
 	do{
 		printf("Enter choice: "); scanf("%d", &role);
-		if(role != 0 || role != 1 || role != 2 || role != 3) printf("Invalid choice. \n");
-	}while(role != 0 || role != 1 || role != 2 || role != 3);
+		if(role != 0 && role != 1 && role != 2 && role != 3) printf("Invalid choice. \n");
+	}while(role != 0 && role != 1 && role != 2 && role != 3);
 	
 	if(role == 0){ 
 		int *arr = calloc(2, sizeof(int));
@@ -205,11 +236,13 @@ int* mainMenu(){
 	char login[20], password[30];
 	printf("Enter login ID: "); scanf(" %[^\n]", login);
 	int flag = checkUser(role, login);
+	printf("Flag %d\n", flag);
 	if(flag == -1){
 		int *arr = calloc(2, sizeof(int));
 		arr[0] = flag; arr[1] = 0;
 		return arr;
 	}
+	/*
 	printf("Enter password: "); 
 	char ch = 'a';int ix = 0;
 	while(1){
@@ -223,7 +256,13 @@ int* mainMenu(){
 			password[ix++] = ch;
 		}
 	}
-	password[ix] = '\0';
+	password[ix] = '\0';*/
 	
-	return validateCreds(role, login, password);
+	/*
+	noecho();
+	scanf(" %[^\n]", password);
+	echo();*/
+	char *passwod = getpass("Enter password: ");
+	
+	return validateCreds(role, login, passwod);
 }

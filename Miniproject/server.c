@@ -14,7 +14,8 @@ struct param{
 void *update(void *parameters){
 
 	struct param *params = (struct param *) parameters;
-	read(params->csd, params->buf, sizeof(params->buf));
+	//read(params->csd, params->buf, sizeof(params->buf));
+	//printf("%s\n", buf);
 	//Check end of connection
 	if(strcmp(params->buf, "exit") == 0){
 		getpeername(params->csd, (struct sockaddr*)&params->cli,&params->len);
@@ -26,18 +27,19 @@ void *update(void *parameters){
 	else{
 		int role[2];
 		read(params->new_fd, role, sizeof(role));
+		printf("Server: %d %d\n", role[0], role[1]);
 		
 		if(role[0] == -2){
 			printf("Invalid Credentials!!!\n");
 			strcpy(params->buf, "Invalid Credentials!!!\n");
 			write(params->new_fd, params->buf, sizeof(params->buf));
-			return;
+			//return;
 		}
 		else if(role[0] == -1){
 			printf("That login ID does not exist for that role. \n");
 			strcpy(params->buf, "That login ID does not exist for that role. \n");
 			write(params->new_fd, params->buf, sizeof(params->buf));
-			return;
+			//return;
 		}
 		else if(role[0] == 0){
 			strcpy(params->buf, "exit");
@@ -68,9 +70,9 @@ void *update(void *parameters){
 		printf("\nMessage from Client %d: %s\n", params->client_sockets[params->ix], params->buf);
 		
 		bzero(params->buf, sizeof(params->buf));
-		//Write message in buffer
+		/*//Write message in buffer
 		printf("\nEnter message: ");scanf(" %[^\n]", params->buf);
-		write(params->new_fd, params->buf, sizeof(params->buf));
+		write(params->new_fd, params->buf, sizeof(params->buf));*/
 	}
 }
 
@@ -101,8 +103,10 @@ int main(){
 	
 	
 	
-	if(bind(sd, (struct sockaddr*)&serv, sizeof(serv)) < 0)
+	if(bind(sd, (struct sockaddr*)&serv, sizeof(serv)) < 0){
 		perror("Bind error\n");
+		exit(1);
+	}
 	listen(sd, 10);
 	printf("Server: Socket created. Listening....\n");
 	

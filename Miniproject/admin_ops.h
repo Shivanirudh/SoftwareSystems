@@ -44,6 +44,7 @@ void addStudent(){
 	else
 		num = 1;
 	s.ID = num;
+	sprintf(s.password, "MT%d", s.ID);
 	
 	write(student_fd, &s, sizeof(s));
 	write_lock.l_type = F_UNLCK;
@@ -77,6 +78,7 @@ void addFaculty(){
 	else
 		num = 1;
 	f.ID = num;
+	sprintf(f.password, "PROF%d", f.ID);
 	
 	write(faculty_fd, &f, sizeof(f));
 	write_lock.l_type = F_UNLCK;
@@ -298,6 +300,7 @@ void deleteFaculty(int ID){
 }
 
 void adminDriver(Admin a){
+	printf("Welcome Mr. %s\n\n", "Vishnu Raj");
 	int opt = -1;
 	while(1){
 		int ID;

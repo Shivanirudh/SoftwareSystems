@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<curses.h>
+#include<ncurses.h>
 #include<stdlib.h>
 #include<unistd.h>
 #include<fcntl.h>
@@ -15,6 +16,8 @@
 #include<arpa/inet.h>
 #include<pthread.h>
 #include<stdbool.h>
+#include<termios.h>
+#include<limits.h>
 
 #define delimiter1 "-----------------------------------------"
 #define delimiter2 "_____________________________________________________________________"

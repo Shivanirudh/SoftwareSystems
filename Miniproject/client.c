@@ -24,7 +24,8 @@ int main(){
 	//int len = sizeof(cli);
 	while(1){
 		
-		int role[2] = mainMenu();
+		int *role = mainMenu();
+		printf("Client: %d %d\n", role[0], role[1]);
 		write(sd, role, sizeof(role));
 		
 		

@@ -91,7 +91,7 @@ void removeCourse(int code){
 	close(course_fd);
 }
 
-void passwordChange(int ID){
+void passwordChange(int ID, bool first_time){
 	int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Faculty tmp;
 	
@@ -118,6 +118,8 @@ void passwordChange(int ID){
 	
 	strcpy(tmp.password, buf);
 	
+	if(first_time) tmp.activated = true;
+	
 	lseek(faculty_fd, (-1)*sizeof(Faculty), SEEK_CUR);
 	write(faculty_fd, &tmp, sizeof(tmp));
 	write_lock.l_type = F_UNLCK;
@@ -127,38 +129,47 @@ void passwordChange(int ID){
 }
 
 void facultyDriver(Faculty f){
-	int opt = -1;
-	while(1){
-		int code;
-		facultyMenuDisplay();
-		printf("Enter choice: ");scanf("%d", &opt);
-		
-		if(opt == 0) break;
-		else if(opt == 1){
-			printf("\n\n");
-			addCourse(f.name);
-			printf("\n\n");
-		}
-		else if(opt == 2){
-			printf("\n\n");
-			viewEnrollments(f.name);
-			printf("\n\n");
-		}
-		else if(opt == 3){
-			printf("Enter code: ");scanf("%d", &code);
-			printf("\n\n");
-			removeCourse(code);
-			printf("\n\n");
-		}
-		else if(opt == 4){
-			printf("\n\n");
-			passwordChange(1);
-			printf("\n\n");
-		}
-		else{
-			printf("Invalid option\n");
-		}
+	printf("Welcome Prof. %s\n\n", f.name);
+	if(f.activated == false){
+		printf("You are logging in for the first time. Please change password. \n");
+		printf("\n\n");
+		passwordChange(f.ID, true);
+		printf("\n\n");
 	}
+	else{
+		int opt = -1;
+		while(1){
+			int code;
+			facultyMenuDisplay();
+			printf("Enter choice: ");scanf("%d", &opt);
+			
+			if(opt == 0) break;
+			else if(opt == 1){
+				printf("\n\n");
+				addCourse(f.name);
+				printf("\n\n");
+			}
+			else if(opt == 2){
+				printf("\n\n");
+				viewEnrollments(f.name);
+				printf("\n\n");
+			}
+			else if(opt == 3){
+				printf("Enter code: ");scanf("%d", &code);
+				printf("\n\n");
+				removeCourse(code);
+				printf("\n\n");
+			}
+			else if(opt == 4){
+				printf("\n\n");
+				passwordChange(f.ID, false);
+				printf("\n\n");
+			}
+			else{
+				printf("Invalid option\n");
+			}
+		}
+	}	
 }
 
 //Testing driver code

@@ -45,11 +45,12 @@ void makeEnrollmentEntry(Enrollment e){
 	
 	printf("Updating details...\n"); //Critical section
 	fcntl(student_course_fd, F_SETLKW, &write_lock);
-	while(read(student_course_fd, &tmp, sizeof(tmp))){
-		if(tmp.s.ID == e.s.ID && tmp.c.code == e.c.code) break;
-	}
+	//while(read(student_course_fd, &tmp, sizeof(tmp))){
+	//	if(tmp.s.ID == e.s.ID && tmp.c.code == e.c.code) break;
+	//}
 	
-	lseek(student_course_fd, -1*sizeof(Enrollment), SEEK_CUR);
+	//lseek(student_course_fd, -1*sizeof(Enrollment), SEEK_CUR);
+	lseek(student_course_fd, 0L, SEEK_END);
 	write(student_course_fd, &e, sizeof(e));
 	
 	write_lock.l_type = F_UNLCK;
@@ -187,7 +188,7 @@ void unenrollCourse(Student s){
 	close(student_course_fd);
 }
 
-void passwordChangeStudent(int ID){
+void passwordChangeStudent(int ID, bool first_time){
 	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Student tmp;
 	
@@ -213,6 +214,7 @@ void passwordChangeStudent(int ID){
 	}while(strcmp(buf, rebuf) != 0);
 	
 	strcpy(tmp.password, buf);
+	if(first_time) tmp.activated = true;
 	
 	lseek(student_fd, (-1)*sizeof(Student), SEEK_CUR);
 	write(student_fd, &tmp, sizeof(tmp));
@@ -223,35 +225,44 @@ void passwordChangeStudent(int ID){
 }
 
 void studentDriver(Student s){
-	int opt = -1;
-	while(1){
-		int code;
-		studentMenuDisplay();
-		printf("Enter choice: ");scanf("%d", &opt);
-		
-		if(opt == 0) break;
-		else if(opt == 1){
-			printf("\n\n");
-			enrollCourse(s);
-			printf("\n\n");
-		}
-		else if(opt == 2){
-			printf("\n\n");
-			unenrollCourse(s);
-			printf("\n\n");
-		}
-		else if(opt == 3){
-			printf("\n\n");
-			viewEnrolledCourses(s);
-			printf("\n\n");
-		}
-		else if(opt == 4){
-			printf("\n\n");
-			passwordChangeStudent(s.ID);
-			printf("\n\n");
-		}
-		else{
-			printf("Invalid option\n");
+	printf("Welcome %s\n\n", s.name);
+	if(s.activated == false){
+		printf("You are logging in for the first time. Please change password. \n");
+		printf("\n\n");
+		passwordChangeStudent(s.ID, true);
+		printf("\n\n");
+	}
+	else{
+		int opt = -1;
+		while(1){
+			int code;
+			studentMenuDisplay();
+			printf("Enter choice: ");scanf("%d", &opt);
+			
+			if(opt == 0) break;
+			else if(opt == 1){
+				printf("\n\n");
+				enrollCourse(s);
+				printf("\n\n");
+			}
+			else if(opt == 2){
+				printf("\n\n");
+				unenrollCourse(s);
+				printf("\n\n");
+			}
+			else if(opt == 3){
+				printf("\n\n");
+				viewEnrolledCourses(s);
+				printf("\n\n");
+			}
+			else if(opt == 4){
+				printf("\n\n");
+				passwordChangeStudent(s.ID, false);
+				printf("\n\n");
+			}
+			else{
+				printf("Invalid option\n");
+			}
 		}
 	}
 }
