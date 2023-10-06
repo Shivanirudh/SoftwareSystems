@@ -15,7 +15,7 @@ void facultyMenuDisplay(){
 /*
 	
 */
-
+/*
 void addCourse(char name[50]){
 	int course_fd = open(course_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Course c = inputCourse();
@@ -45,12 +45,70 @@ void addCourse(char name[50]){
 	fcntl(course_fd, F_SETLK, &write_lock);
 	printf("Saved successfully\n");
 	close(course_fd);
+}*/
+
+Course addCourse(){
+	Course c = inputCourse();
+	return c;
 }
 
-void viewEnrollments(char name[50]){
+int updateCourseDB(Course c, int action){
+	if(action == 1){
+		int course_fd = open(course_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
+		Course tmp;
+		int num = 1;
+		
+		struct flock write_lock = getLock(F_WRLCK, SEEK_SET, 0, 0); //Acquire write lock
+		
+		printf("Saving details...\n"); //Critical section
+		fcntl(course_fd, F_SETLKW, &write_lock);
+		
+		struct stat file_details;
+		stat(course_file, &file_details);
+		if(file_details.st_size > 1){
+			lseek(course_fd, -1*sizeof(c), SEEK_END);
+			read(course_fd, &tmp, sizeof(tmp));
+			num = tmp.code;
+			num++;
+		}
+		else
+			num = 1;
+		c.code = num;
+		
+		write(course_fd, &c, sizeof(c));
+		write_lock.l_type = F_UNLCK;
+		fcntl(course_fd, F_SETLK, &write_lock);
+		printf("Saved successfully\n");
+		close(course_fd);
+		return c.code;
+	}
+	else if(action == 2){
+		int course_fd = open(course_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
+		Course tmp; 
+		
+		struct flock write_lock = getLock(F_WRLCK, SEEK_SET, (c.code-1)*sizeof(Course), sizeof(Course)); //Acquire write lock
+		
+		printf("Fetching updated details...\n"); //Critical section
+		fcntl(course_fd, F_SETLKW, &write_lock);
+		
+		lseek(course_fd, (c.code-1)*sizeof(Course), SEEK_SET);
+		read(course_fd, &tmp, sizeof(tmp));
+		
+		tmp.active = false;
+		
+		lseek(course_fd, (-1)*sizeof(Course), SEEK_CUR);
+		write(course_fd, &tmp, sizeof(tmp));
+		write_lock.l_type = F_UNLCK;
+		fcntl(course_fd, F_SETLK, &write_lock);
+		printf("Changes saved successfully\n");
+		close(course_fd);
+	}
+}
+
+int numberEnrollments(char name[50]){
 	int course_fd = open(course_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Course tmp;
-	int num = 1;
+	int count = 0;
 	
 	struct flock read_lock = getLock(F_RDLCK, SEEK_SET, 0, 0); //Acquire write lock
 	
@@ -58,13 +116,34 @@ void viewEnrollments(char name[50]){
 	fcntl(course_fd, F_SETLKW, &read_lock);
 	while(read(course_fd, &tmp, sizeof(tmp))){
 		if(tmp.active && strcmp(name, tmp.faculty_name) == 0)
-			printCourse(tmp);
+			count++;
 	}
 	read_lock.l_type = F_UNLCK;
 	fcntl(course_fd, F_SETLK, &read_lock);
 	close(course_fd);
+	return count;
 }
 
+Course* viewEnrollments(char name[50], int count){
+	int course_fd = open(course_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
+	Course tmp;
+	Course *ans = calloc(count, sizeof(Course));
+	int ix = 0;
+	
+	struct flock read_lock = getLock(F_RDLCK, SEEK_SET, 0, 0); //Acquire write lock
+	
+	printf("Fetching details...\n"); //Critical section
+	fcntl(course_fd, F_SETLKW, &read_lock);
+	while(read(course_fd, &tmp, sizeof(tmp))){
+		if(tmp.active && strcmp(name, tmp.faculty_name) == 0)
+			ans[ix++] = tmp;
+	}
+	read_lock.l_type = F_UNLCK;
+	fcntl(course_fd, F_SETLK, &read_lock);
+	close(course_fd);
+	return ans;
+}
+/*
 void removeCourse(int code){
 	int course_fd = open(course_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Course tmp; 
@@ -89,8 +168,9 @@ void removeCourse(int code){
 	fcntl(course_fd, F_SETLK, &write_lock);
 	printf("Changes saved successfully\n");
 	close(course_fd);
-}
+}*/
 
+/*
 void passwordChange(int ID, bool first_time){
 	int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Faculty tmp;
@@ -126,8 +206,21 @@ void passwordChange(int ID, bool first_time){
 	fcntl(faculty_fd, F_SETLK, &write_lock);
 	printf("Changes saved successfully\n");
 	close(faculty_fd);
-}
+}*/
 
+char* passwordChange(int ID){
+	char *buf = calloc(1024, sizeof(char)); 
+	char* rebuf = calloc(1024, sizeof(char));
+	do{
+		printf("Enter new password: ");scanf(" %[^\n]", buf);
+		printf("Re-enter new password: ");scanf(" %[^\n]", rebuf);
+		if(strcmp(buf, rebuf) != 0){
+			printf("Passwords are not matching. Please re-enter: \n\n");
+		}
+	}while(strcmp(buf, rebuf) != 0);
+	return buf;
+}
+/*
 void facultyDriver(Faculty f){
 	printf("Welcome Prof. %s\n\n", f.name);
 	if(f.activated == false){
@@ -170,7 +263,7 @@ void facultyDriver(Faculty f){
 			}
 		}
 	}	
-}
+}*/
 
 //Testing driver code
 /*

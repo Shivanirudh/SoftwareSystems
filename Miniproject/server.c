@@ -51,89 +51,136 @@ void *update(void *parameters){
 			Admin a = getAdmin();
 			write(params->new_fd, (void*) &a, sizeof(a));
 			
-			while(1){
-			int opt = -1;
-			read(params->new_fd, &opt, sizeof(int));
-			if(opt == 0);
-			else if(opt == 1){
-				Student s;
-				read(params->new_fd, (void*) &s, sizeof(s));
-				updateStudentDB(s, 1);
-			}
-			else if(opt == 2){
-				int ID;
-				read(params->new_fd, &ID, sizeof(ID));
-				Student s = getStudent(ID);
-				write(params->new_fd, (void*) &s, sizeof(s));
-			}
-			else if(opt == 3){
-				Faculty f;
-				read(params->new_fd, (void*) &f, sizeof(f));
-				updateFacultyDB(f, 1);
-			}
-			else if(opt == 4){
-				int ID;
-				read(params->new_fd, &ID, sizeof(ID));
-				Faculty f = getFaculty(ID);
-				write(params->new_fd, (void*) &f, sizeof(f));
-			}
-			else if(opt == 5){
-				int ID;
-				read(params->new_fd, &ID, sizeof(ID));
-				Student s = getStudent(ID);
-				write(params->new_fd, (void*) &s, sizeof(s));
-				read(params->new_fd, (void*) &s, sizeof(s));
-				updateStudentDB(s, 2);
-			}
-			else if(opt == 6){
-				int ID;
-				read(params->new_fd, &ID, sizeof(ID));
-				Student s = getStudent(ID);
-				write(params->new_fd, (void*) &s, sizeof(s));
-				if(s.active){
+			// while(1){
+				int opt = -1;
+				read(params->new_fd, &opt, sizeof(int));
+				if(opt == 0) ;
+				else if(opt == 1){
+					Student s;
 					read(params->new_fd, (void*) &s, sizeof(s));
-					updateStudentDB(s, 2);
+					int ID = updateStudentDB(s, 1);
+					write(params->new_fd, &ID, sizeof(int));
 				}
-			}
-			else if(opt == 7){
-				int ID;
-				read(params->new_fd, &ID, sizeof(ID));
-				Faculty f = getFaculty(ID);
-				write(params->new_fd, (void*) &f, sizeof(f));
-				if(f.active){
+				else if(opt == 2){
+					int ID;
+					read(params->new_fd, &ID, sizeof(ID));
+					Student s = getStudent(ID);
+					write(params->new_fd, (void*) &s, sizeof(s));
+				}
+				else if(opt == 3){
+					Faculty f;
 					read(params->new_fd, (void*) &f, sizeof(f));
-					updateFacultyDB(f, 2);
+					int ID = updateFacultyDB(f, 1);
+					write(params->new_fd, &ID, sizeof(int));
 				}
-			}
-			else if(opt == 8){
-				int ID;
-				read(params->new_fd, &ID, sizeof(ID));
-				Student s = getStudent(ID);
-				write(params->new_fd, (void*) &s, sizeof(s));
-				if(s.active){
-					updateStudentDB(s, 3);
+				else if(opt == 4){
+					int ID;
+					read(params->new_fd, &ID, sizeof(ID));
+					Faculty f = getFaculty(ID);
+					write(params->new_fd, (void*) &f, sizeof(f));
 				}
-			}
-			else if(opt == 9){
-				int ID;
-				read(params->new_fd, &ID, sizeof(ID));
-				Faculty f = getFaculty(ID);
-				write(params->new_fd, (void*) &f, sizeof(f));
-				if(f.active){
-					updateFacultyDB(f, 3);
+				else if(opt == 5){
+					int ID;
+					read(params->new_fd, &ID, sizeof(ID));
+					Student s = getStudent(ID);
+					write(params->new_fd, (void*) &s, sizeof(s));
+					read(params->new_fd, (void*) &s, sizeof(s));
+					updateStudentDB(s, 4);
 				}
-			}
-			}
-			
-			
-			//adminDriver(a);
+				else if(opt == 6){
+					int ID;
+					read(params->new_fd, &ID, sizeof(ID));
+					Student s = getStudent(ID);
+					write(params->new_fd, (void*) &s, sizeof(s));
+					if(s.active == true){
+						Student st;
+						read(params->new_fd, (void*) &st, sizeof(st));
+						updateStudentDB(st, 2);
+					}
+				}
+				else if(opt == 7){
+					int ID;
+					read(params->new_fd, &ID, sizeof(ID));
+					Faculty f = getFaculty(ID);
+					write(params->new_fd, (void*) &f, sizeof(f));
+					if(f.active == true){
+						Faculty fa;
+						read(params->new_fd, (void*) &fa, sizeof(fa));
+						printFaculty(fa);
+						updateFacultyDB(fa, 2);
+					}
+				}
+				else if(opt == 8){
+					int ID;
+					read(params->new_fd, &ID, sizeof(ID));
+					Student s = getStudent(ID);
+					write(params->new_fd, (void*) &s, sizeof(s));
+					if(s.active == true){
+						updateStudentDB(s, 3);
+					}
+				}
+				else if(opt == 9){
+					int ID;
+					read(params->new_fd, &ID, sizeof(ID));
+					Faculty f = getFaculty(ID);
+					write(params->new_fd, (void*) &f, sizeof(f));
+					if(f.active == true){
+						updateFacultyDB(f, 3);
+					}
+				}
+			// }
 		}
 		else if(role[0] == 2){
 			strcpy(params->buf, "Logged in as Faculty \n");
 			write(params->new_fd, params->buf, sizeof(params->buf));
 			Faculty f = getFaculty(role[1]);
 			write(params->new_fd, (void*) &f, sizeof(f));
-			//facultyDriver(f);
+			if(f.activated == false){
+				char newpass[1024];bool first_time;
+				read(params->new_fd, newpass, sizeof(newpass));
+				read(params->new_fd, &first_time, sizeof(first_time));
+				strcpy(f.password, newpass);
+				f.activated = true;
+				updateFacultyDB(f, 4);
+			}
+			else{
+				// while(1){
+					int opt = -1;
+					read(params->new_fd, &opt, sizeof(int));
+					if(opt == 0);
+					else if(opt == 1){
+						Course c;char faculty_name[1024];
+						read(params->new_fd, (void*) &c, sizeof(c));
+						read(params->new_fd, faculty_name, sizeof(faculty_name));
+						strcpy(c.faculty_name, faculty_name);
+						int code = updateCourseDB(c, 1);
+						write(params->new_fd, &code, sizeof(int));
+					}
+					else if(opt == 2){
+						char faculty_name[1024];
+						read(params->new_fd, faculty_name, sizeof(faculty_name));
+						int count = numberEnrollments(faculty_name);
+						Course *ans = viewEnrollments(faculty_name, count);
+						write(params->new_fd, ans, sizeof(ans));
+						write(params->new_fd, &count, sizeof(count));
+					}
+					else if(opt == 3){
+						int code;
+						read(params->new_fd, &code, sizeof(int));
+						Course c = getCourse(code);
+						write(params->new_fd, (void*) &c, sizeof(c));
+						if(c.active == true){
+							updateCourseDB(c, 2);
+						}
+					}
+					else if(opt == 4){
+						char newpass[1024];
+						read(params->new_fd, newpass, sizeof(newpass));
+						strcpy(f.password, newpass);
+						updateFacultyDB(f, 4);
+					}
+				// }
+			}
 		}
 		else if(role[0] == 3){
 			strcpy(params->buf, "Logged in as Student \n");

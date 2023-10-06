@@ -6,7 +6,7 @@ void studentMenuDisplay(){
 	printf("%s\n", delimiter2);
 	printf("Choose option:\n");
 	printf("1. Enroll in a course\n");
-	printf("2. Unenroll from a course\n");            // View all courses offered by this faculty 
+	printf("2. Unenroll from a course\n");
 	printf("3. View enrolled courses\n");
 	printf("4. Change Password\n");
 	printf("0. Logout\n");

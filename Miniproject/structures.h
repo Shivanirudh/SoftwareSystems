@@ -23,6 +23,7 @@
 #define delimiter2 "_____________________________________________________________________"
 
 #define PORT_NO 8008
+#define COURSE_LIMIT 100
 
 #define admin_file "admin_creds.bin"
 #define student_file "students.bin"
