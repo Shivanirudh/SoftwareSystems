@@ -21,7 +21,7 @@ void adminMenuDisplay(){
 	Most functions in this file work on a full DB basis, including addition and deletion of records. For that reason all the locks acquired for this perform mandatory locking. 
 	The exception to this are the updation and view functionalities, which perform advisory locking on just the record that is to be updated/viewed. 
 */
-
+/*
 void addStudent(){
 	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Student s = inputStudent();
@@ -54,8 +54,17 @@ void addStudent(){
 	printf("One time Password: MT%d\n", s.ID);
 	printf("Note: Student will be forced to change password on the first login. \n");
 	close(student_fd);
-}
+}*/
 
+Student addStudent(){
+	Student s = inputStudent();
+	printf("Saved successfully\n");
+	printf("Student's Login ID: MT%d\n", s.ID);
+	printf("One time Password: MT%d\n", s.ID);
+	printf("Note: Student will be forced to change password on the first login. \n");
+	return s;
+}
+/*
 void addFaculty(){
 	int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Faculty f = inputFaculty();
@@ -88,9 +97,17 @@ void addFaculty(){
 	printf("One time Password: PROF%d\n", f.ID);
 	printf("Note: Faculty will be forced to change password on the first login. \n");
 	close(faculty_fd);
+}*/
+Faculty addFaculty(){
+	Faculty f = inputFaculty();
+	printf("Saved successfully\n");
+	printf("Faculty Login ID: PROF%d\n", f.ID);
+	printf("One time Password: PROF%d\n", f.ID);
+	printf("Note: Faculty will be forced to change password on the first login. \n");
+	return f;
 }
 
-void updateStudent(int ID){
+/*void updateStudent(int ID){
 	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Student tmp; tmp.ID = 0;
 	int num = 1;
@@ -120,8 +137,14 @@ void updateStudent(int ID){
 	fcntl(student_fd, F_SETLK, &write_lock);
 	printf("Changes saved successfully\n");
 	close(student_fd);
-}
+}*/
 
+Student updateStudent(int ID){
+	Student s = inputStudent();
+	printf("Saved successfully\n");
+	return s;
+}
+/*
 void updateFaculty(int ID){
 	int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Faculty tmp;tmp.ID = 0;
@@ -151,8 +174,14 @@ void updateFaculty(int ID){
 	fcntl(faculty_fd, F_SETLK, &write_lock);
 	printf("Changes saved successfully\n");
 	close(faculty_fd);
+}*/
+Faculty updateFaculty(int ID){
+	Faculty f = inputFaculty();
+	printf("Saved successfully\n");
+	return f;
 }
 
+/*
 void viewStudent(int ID){
 	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Student tmp; tmp.ID = 0;
@@ -173,7 +202,7 @@ void viewStudent(int ID){
 	read_lock.l_type = F_UNLCK;
 	fcntl(student_fd, F_SETLK, &read_lock);
 	close(student_fd);
-}
+}*/
 
 void viewFaculty(int ID){
 	int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
@@ -196,7 +225,7 @@ void viewFaculty(int ID){
 	fcntl(faculty_fd, F_SETLK, &read_lock);
 	close(faculty_fd);
 }
-
+/*
 void blockStudent(int ID){
 	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Student tmp; tmp.ID = 0;
@@ -243,7 +272,34 @@ void blockStudent(int ID){
 	fcntl(student_fd, F_SETLK, &write_lock);
 	printf("Changes saved successfully\n");
 	close(student_fd);
-}
+}*/
+/*
+void deleteStudent(int ID){
+	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
+	Student tmp; tmp.ID = 0;
+	int num = 1;
+	
+	struct flock write_lock = getLock(F_WRLCK, SEEK_SET, (ID-1)*sizeof(Student), sizeof(Student)); //Acquire write lock
+	
+	printf("Fetching updated details...\n"); //Critical section
+	fcntl(student_fd, F_SETLKW, &write_lock);
+	
+	lseek(student_fd, (ID-1)*sizeof(Student), SEEK_SET);
+	read(student_fd, &tmp, sizeof(tmp));
+	if(tmp.active == false){
+		printf("Student with this ID not found\n");
+		return;
+	}
+	
+	tmp.active = false;
+	
+	lseek(student_fd, (-1)*sizeof(Student), SEEK_CUR);
+	write(student_fd, &tmp, sizeof(tmp));
+	write_lock.l_type = F_UNLCK;
+	fcntl(student_fd, F_SETLK, &write_lock);
+	printf("Changes saved successfully\n");
+	close(student_fd);
+}*/
 
 void deleteStudent(int ID){
 	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
@@ -298,7 +354,7 @@ void deleteFaculty(int ID){
 	printf("Changes saved successfully\n");
 	close(faculty_fd);
 }
-
+/*
 void adminDriver(Admin a){
 	printf("Welcome Mr. %s\n\n", "Vishnu Raj");
 	int opt = -1;
@@ -310,7 +366,7 @@ void adminDriver(Admin a){
 		if(opt == 0) break;
 		else if(opt == 1){
 			printf("\n\n");
-			addStudent();
+			Student s = addStudent();
 			printf("\n\n");
 		}
 		else if(opt == 2){
@@ -363,7 +419,7 @@ void adminDriver(Admin a){
 			printf("Invalid option\n");
 		}
 	}
-}
+}*/
 
 //Testing driver code
 /*

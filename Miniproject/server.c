@@ -50,6 +50,82 @@ void *update(void *parameters){
 			write(params->new_fd, params->buf, sizeof(params->buf));
 			Admin a = getAdmin();
 			write(params->new_fd, (void*) &a, sizeof(a));
+			
+			while(1){
+			int opt = -1;
+			read(params->new_fd, &opt, sizeof(int));
+			if(opt == 0);
+			else if(opt == 1){
+				Student s;
+				read(params->new_fd, (void*) &s, sizeof(s));
+				updateStudentDB(s, 1);
+			}
+			else if(opt == 2){
+				int ID;
+				read(params->new_fd, &ID, sizeof(ID));
+				Student s = getStudent(ID);
+				write(params->new_fd, (void*) &s, sizeof(s));
+			}
+			else if(opt == 3){
+				Faculty f;
+				read(params->new_fd, (void*) &f, sizeof(f));
+				updateFacultyDB(f, 1);
+			}
+			else if(opt == 4){
+				int ID;
+				read(params->new_fd, &ID, sizeof(ID));
+				Faculty f = getFaculty(ID);
+				write(params->new_fd, (void*) &f, sizeof(f));
+			}
+			else if(opt == 5){
+				int ID;
+				read(params->new_fd, &ID, sizeof(ID));
+				Student s = getStudent(ID);
+				write(params->new_fd, (void*) &s, sizeof(s));
+				read(params->new_fd, (void*) &s, sizeof(s));
+				updateStudentDB(s, 2);
+			}
+			else if(opt == 6){
+				int ID;
+				read(params->new_fd, &ID, sizeof(ID));
+				Student s = getStudent(ID);
+				write(params->new_fd, (void*) &s, sizeof(s));
+				if(s.active){
+					read(params->new_fd, (void*) &s, sizeof(s));
+					updateStudentDB(s, 2);
+				}
+			}
+			else if(opt == 7){
+				int ID;
+				read(params->new_fd, &ID, sizeof(ID));
+				Faculty f = getFaculty(ID);
+				write(params->new_fd, (void*) &f, sizeof(f));
+				if(f.active){
+					read(params->new_fd, (void*) &f, sizeof(f));
+					updateFacultyDB(f, 2);
+				}
+			}
+			else if(opt == 8){
+				int ID;
+				read(params->new_fd, &ID, sizeof(ID));
+				Student s = getStudent(ID);
+				write(params->new_fd, (void*) &s, sizeof(s));
+				if(s.active){
+					updateStudentDB(s, 3);
+				}
+			}
+			else if(opt == 9){
+				int ID;
+				read(params->new_fd, &ID, sizeof(ID));
+				Faculty f = getFaculty(ID);
+				write(params->new_fd, (void*) &f, sizeof(f));
+				if(f.active){
+					updateFacultyDB(f, 3);
+				}
+			}
+			}
+			
+			
 			//adminDriver(a);
 		}
 		else if(role[0] == 2){
