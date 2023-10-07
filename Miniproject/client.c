@@ -49,7 +49,24 @@ int main(){
 			//Admin a = getAdmin();
 			Admin a;
 			read(sd, (void*) &a, sizeof(a));
-			adminDriver(a);
+			// adminDriver(a);	
+			int opt = -1;char buf[1024];int ID = -1;
+			bzero(&buf, sizeof(buf));read(sd, buf, sizeof(buf));printf("%s", buf);usleep(100000);
+			while(1){
+				adminMenuDisplay();
+				printf("Enter choice: ");scanf("%d", &opt);
+				if(opt == 0) break;
+				else write(sd, &opt, sizeof(opt));
+				if(opt == 1){
+					Student s = inputStudent();
+					write(sd, (void*) &s, sizeof(s));
+					read(sd, &ID, sizeof(ID));
+					printf("Saved successfully\n");
+					printf("Student's Login ID: MT%d\n", ID);
+					printf("One time Password: MT%d\n", ID);
+					printf("Note: Student will be forced to change password on the first login. \n");
+				}
+			}
 		}
 		else if(role[0] == 2){
 			//Faculty f = getFaculty(role[1]);

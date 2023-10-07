@@ -22,15 +22,15 @@ void adminMenuDisplay(){
 	The exception to this are the updation and view functionalities, which perform advisory locking on just the record that is to be updated/viewed. 
 */
 
-void addStudent(){
+void addStudent(int sock, Student s){
 	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
-	Student s = inputStudent();
+	// Student s = inputStudent();
 	Student tmp;
 	int num = 1;
 	
 	struct flock write_lock = getLock(F_WRLCK, SEEK_SET, 0, 0); //Acquire write lock
 	
-	printf("Saving details...\n"); //Critical section
+	// print("Saving details...\n", sock);usleep(100000);// printf("Saving details...\n"); //Critical section
 	fcntl(student_fd, F_SETLKW, &write_lock);
 	
 	struct stat file_details;
@@ -49,11 +49,17 @@ void addStudent(){
 	write(student_fd, &s, sizeof(s));
 	write_lock.l_type = F_UNLCK;
 	fcntl(student_fd, F_SETLK, &write_lock);
-	printf("Saved successfully\n");
-	printf("Student's Login ID: MT%d\n", s.ID);
-	printf("One time Password: MT%d\n", s.ID);
-	printf("Note: Student will be forced to change password on the first login. \n");
+	// char buf[1024];
+	// strcpy(buf, "Saved successfully\n");// printf("Saved successfully\n");
+	// char buf1[1024], buf2[1024];
+	// sprintf(buf1, "Student's Login ID: MT%d\n", s.ID);// printf("Student's Login ID: MT%d\n", s.ID);
+	// strcat(buf, buf1);
+	// sprintf(buf1, "One time Password: MT%d\n", s.ID);// printf("One time Password: MT%d\n", s.ID);
+	// strcat(buf, buf1);
+	// strcat(buf, "Note: Student will be forced to change password on the first login. \n");
+	// print(buf, sock);usleep(100000);// printf("Note: Student will be forced to change password on the first login. \n");
 	close(student_fd);
+	write(sock, &s.ID, sizeof(s.ID));
 }
 
 void addFaculty(){
@@ -299,19 +305,25 @@ void deleteFaculty(int ID){
 	close(faculty_fd);
 }
 
-void adminDriver(Admin a){
-	printf("Welcome Mr. %s\n\n", "Vishnu Raj");
+void adminDriver(Admin a, int socket_desc){
+	char buf[1024];
+	sprintf(buf,"Welcome Mr. %s\n\n", "Vishnu Raj");
+	// printf();
+	write(socket_desc, buf, sizeof(buf));
 	int opt = -1;
 	while(1){
 		int ID;
-		adminMenuDisplay();
-		printf("Enter choice: ");scanf("%d", &opt);
+		// adminMenuDisplay();
+		// printf("Enter choice: ");scanf("%d", &opt);
+		read(socket_desc, &opt, sizeof(opt));
 		
 		if(opt == 0) break;
 		else if(opt == 1){
-			printf("\n\n");
-			addStudent();
-			printf("\n\n");
+			print("\n\n", socket_desc);// printf("\n\n");
+			Student s;
+			read(socket_desc, (void*) &s, sizeof(s));
+			addStudent(socket_desc, s);
+			print("\n\n", socket_desc);// printf("\n\n");
 		}
 		else if(opt == 2){
 			printf("Enter ID: ");scanf("%d", &ID);

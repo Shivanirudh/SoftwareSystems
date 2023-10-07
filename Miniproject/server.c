@@ -50,7 +50,7 @@ void *update(void *parameters){
 			write(params->new_fd, params->buf, sizeof(params->buf));
 			Admin a = getAdmin();
 			write(params->new_fd, (void*) &a, sizeof(a));
-			//adminDriver(a);
+			adminDriver(a, params->new_fd);
 		}
 		else if(role[0] == 2){
 			strcpy(params->buf, "Logged in as Faculty \n");

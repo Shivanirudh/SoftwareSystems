@@ -10,28 +10,6 @@ struct flock getLock(short l_type, short l_whence, off_t l_start, off_t l_len){
 	return mylock;
 }
 
-ssize_t my_getpass (char **lineptr, size_t *n, FILE *stream)
-{
-  struct termios old, new;
-  int nread;
-
-  /* Turn echoing off and fail if we can’t. */
-  if (tcgetattr (fileno (stream), &old) != 0)
-    return -1;
-  new = old;
-  new.c_lflag &= ~ECHO;
-  if (tcsetattr (fileno (stream), TCSAFLUSH, &new) != 0)
-    return -1;
-
-  /* Read the passphrase */
-  nread = getline (lineptr, n, stream);
-
-  /* Restore terminal. */
-  (void) tcsetattr (fileno (stream), TCSAFLUSH, &old);
-
-  return nread;
-}
-
 Admin getAdmin(){
 	int admin_fd = open(admin_file, O_RDWR|O_CREAT, S_IRWXU);
 	Admin a;
@@ -265,4 +243,8 @@ int* mainMenu(){
 	char *passwod = getpass("Enter password: ");
 	
 	return validateCreds(role, login, passwod);
+}
+
+void print(char *buf, int sock){
+	write(sock, buf, sizeof(buf));
 }
