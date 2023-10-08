@@ -47,8 +47,8 @@ int main(){
 		}
 		else if(role[0] == 1){
 			//Admin a = getAdmin();
-			Admin a;
-			read(sd, (void*) &a, sizeof(a));
+			// Admin a;
+			// read(sd, (void*) &a, sizeof(a));
 			// adminDriver(a);	
 			int opt = -1;char buf[1024];int ID = -1;
 			bzero(&buf, sizeof(buf));read(sd, buf, sizeof(buf));printf("%s", buf);usleep(100000);
@@ -58,6 +58,7 @@ int main(){
 				if(opt == 0) break;
 				else write(sd, &opt, sizeof(opt));
 				if(opt == 1){
+					printf("\n\n");
 					Student s = inputStudent();
 					write(sd, (void*) &s, sizeof(s));
 					read(sd, &ID, sizeof(ID));
@@ -65,6 +66,122 @@ int main(){
 					printf("Student's Login ID: MT%d\n", ID);
 					printf("One time Password: MT%d\n", ID);
 					printf("Note: Student will be forced to change password on the first login. \n");
+					printf("\n\n");
+				}
+				else if(opt == 2){
+					printf("\n\n");
+					Student s;
+					printf("Enter ID: ");scanf("%d", &ID);
+					write(sd, &ID, sizeof(ID));
+					read(sd, (void*) &s, sizeof(s));
+					if(s.active == false) printf("Student with this ID not found\n");
+					else printStudent(s);
+					printf("\n\n");
+				}
+				else if(opt == 3){
+					printf("\n\n");
+					Faculty f = inputFaculty();
+					write(sd, (void*) &f, sizeof(f));
+					read(sd, &ID, sizeof(ID));
+					printf("Saved successfully\n");
+					printf("Faculty Login ID: PROF%d\n", ID);
+					printf("One time Password: PROF%d\n", ID);
+					printf("Note: Faculty will be forced to change password on the first login. \n");
+					printf("\n\n");
+				}
+				else if(opt == 4){
+					printf("\n\n");
+					Faculty f;
+					printf("Enter ID: ");scanf("%d", &ID);
+					write(sd, &ID, sizeof(ID));
+					read(sd, (void*) &f, sizeof(f));
+					if(f.active == false) printf("Faculty with this ID not found\n");
+					else printFaculty(f);
+					printf("\n\n");
+				}
+				else if(opt == 5){
+					printf("\n\n");
+					int block;
+					printf("Enter ID: ");scanf("%d", &ID);
+					printf("Block or unblock? (1/0)");scanf("%d", &block);
+					write(sd, &ID, sizeof(ID));
+					write(sd, &block, sizeof(block));
+					char buf[1024];
+					read(sd, buf, sizeof(buf));
+					printf("%s\n", buf);
+					printf("\n\n");
+				}
+				else if(opt == 6){
+					printf("\n\n");
+					Student s;
+					printf("Enter ID: ");scanf("%d", &ID);
+					write(sd, &ID, sizeof(ID));
+					read(sd, (void*) &s, sizeof(s));
+					if(s.active == false) printf("Student with this ID not found\n");
+					else{
+						printStudent(s);
+						printf("Enter updated details: \n");
+						Student st = inputStudent();
+						write(sd, (void*) &st, sizeof(st));
+						char buf[1024];
+						read(sd, buf, sizeof(buf));
+						printf("%s\n", buf);
+					}
+					printf("\n\n");
+				}
+				else if(opt == 7){
+					printf("\n\n");
+					Faculty f;
+					printf("Enter ID: ");scanf("%d", &ID);
+					write(sd, &ID, sizeof(ID));
+					read(sd, (void*) &f, sizeof(f));
+					if(f.active == false) printf("Faculty with this ID not found\n");
+					else{
+						printFaculty(f);
+						printf("Enter updated details: \n");
+						Faculty fa = inputFaculty();
+						write(sd, (void*) &fa, sizeof(fa));
+						char buf[1024];
+						read(sd, buf, sizeof(buf));
+						printf("%s\n", buf);
+					}
+					printf("\n\n");
+				}
+				else if(opt == 8){
+					printf("Enter ID: ");scanf("%d", &ID);
+					write(sd, &ID, sizeof(ID));
+					Student s;
+					read(sd, (void*) &s, sizeof(s));
+					if(s.active == false) printf("Student with this ID not found\n");
+					else{
+						printStudent(s);char choice;
+						printf("Do you want to delete above entry? (y/n)");scanf(" %c", &choice);
+						write(sd, &choice, sizeof(choice));
+						if(choice == 'y'||choice=='Y'){
+							char buf[1024];
+							read(sd, buf, sizeof(buf));
+							printf("%s\n", buf);
+						}
+					}
+					printf("\n\n");
+				}
+				else if(opt == 9){
+					printf("Enter ID: ");scanf("%d", &ID);
+					write(sd, &ID, sizeof(ID));
+					Faculty f;
+					read(sd, (void*) &f, sizeof(f));
+					if(f.active == false) printf("Faculty with this ID not found\n");
+					else{
+						printFaculty(f);char choice;
+						printf("Do you want to delete above entry? (y/n)");scanf(" %c", &choice);
+						write(sd, &choice, sizeof(choice));
+						if(choice == 'y'||choice=='Y'){
+							char buf[1024];
+							read(sd, buf, sizeof(buf));
+							printf("%s\n", buf);
+						}
+					}
+					printf("\n\n");
 				}
 			}
 		}

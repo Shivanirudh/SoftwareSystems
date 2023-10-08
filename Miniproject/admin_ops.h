@@ -30,7 +30,6 @@ void addStudent(int sock, Student s){
 	
 	struct flock write_lock = getLock(F_WRLCK, SEEK_SET, 0, 0); //Acquire write lock
 	
-	// print("Saving details...\n", sock);usleep(100000);// printf("Saving details...\n"); //Critical section
 	fcntl(student_fd, F_SETLKW, &write_lock);
 	
 	struct stat file_details;
@@ -49,28 +48,18 @@ void addStudent(int sock, Student s){
 	write(student_fd, &s, sizeof(s));
 	write_lock.l_type = F_UNLCK;
 	fcntl(student_fd, F_SETLK, &write_lock);
-	// char buf[1024];
-	// strcpy(buf, "Saved successfully\n");// printf("Saved successfully\n");
-	// char buf1[1024], buf2[1024];
-	// sprintf(buf1, "Student's Login ID: MT%d\n", s.ID);// printf("Student's Login ID: MT%d\n", s.ID);
-	// strcat(buf, buf1);
-	// sprintf(buf1, "One time Password: MT%d\n", s.ID);// printf("One time Password: MT%d\n", s.ID);
-	// strcat(buf, buf1);
-	// strcat(buf, "Note: Student will be forced to change password on the first login. \n");
-	// print(buf, sock);usleep(100000);// printf("Note: Student will be forced to change password on the first login. \n");
 	close(student_fd);
 	write(sock, &s.ID, sizeof(s.ID));
 }
 
-void addFaculty(){
+void addFaculty(int sock, Faculty f){
 	int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
-	Faculty f = inputFaculty();
+	// Faculty f = inputFaculty();
 	Faculty tmp;
 	int num = 1;
 	
 	struct flock write_lock = getLock(F_WRLCK, SEEK_SET, 0, 0); //Acquire write lock
 	
-	printf("Saving details...\n"); //Critical section
 	fcntl(faculty_fd, F_SETLKW, &write_lock);
 	
 	struct stat file_details;
@@ -89,17 +78,15 @@ void addFaculty(){
 	write(faculty_fd, &f, sizeof(f));
 	write_lock.l_type = F_UNLCK;
 	fcntl(faculty_fd, F_SETLK, &write_lock);
-	printf("Saved successfully\n");
-	printf("Faculty Login ID: PROF%d\n", f.ID);
-	printf("One time Password: PROF%d\n", f.ID);
-	printf("Note: Faculty will be forced to change password on the first login. \n");
 	close(faculty_fd);
+	write(sock, &f.ID, sizeof(f.ID));
 }
 
-void updateStudent(int ID){
+void updateStudent(int ID, Student s, int sock){
 	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Student tmp; tmp.ID = 0;
 	int num = 1;
+	char buf[1024];
 	
 	struct flock write_lock = getLock(F_WRLCK, SEEK_SET, (ID-1)*sizeof(Student), sizeof(Student)); //Acquire write lock
 	
@@ -110,29 +97,33 @@ void updateStudent(int ID){
 	read(student_fd, &tmp, sizeof(tmp));
 	if(tmp.active == false){
 		printf("Student with this ID not found\n");
-		return;
+		strcpy(buf, "Student with this ID not found\n");
+		write(sock, buf, sizeof(buf));
+		// return;
 	}
-	
-	Student s = inputStudent();
-	
-	strcpy(s.password, tmp.password);
-	s.activated = tmp.activated;
-	s.blocked = tmp.blocked; 
-	s.active = tmp.active;
-	
-	lseek(student_fd, (-1)*sizeof(Student), SEEK_CUR);
-	write(student_fd, &s, sizeof(s));
+	else{
+		strcpy(s.password, tmp.password);
+		s.activated = tmp.activated;
+		s.blocked = tmp.blocked; 
+		s.active = tmp.active;
+		
+		lseek(student_fd, (-1)*sizeof(Student), SEEK_CUR);
+		write(student_fd, &s, sizeof(s));
+	}
 	write_lock.l_type = F_UNLCK;
 	fcntl(student_fd, F_SETLK, &write_lock);
 	printf("Changes saved successfully\n");
+	strcpy(buf, "Changes saved successfully\n");
+	write(sock, buf, sizeof(buf));
 	close(student_fd);
 }
 
-void updateFaculty(int ID){
+void updateFaculty(int ID, Faculty f, int sock){
 	int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Faculty tmp;tmp.ID = 0;
 	int num = 1;
-	
+	char buf[1024];
+
 	struct flock write_lock = getLock(F_WRLCK, SEEK_SET, (ID-1)*sizeof(Faculty), sizeof(Faculty)); //Acquire write lock
 	
 	printf("Fetching updated details...\n"); //Critical section
@@ -142,27 +133,30 @@ void updateFaculty(int ID){
 	read(faculty_fd, &tmp, sizeof(tmp));
 	if(tmp.active == false){
 		printf("Faculty with this ID not found\n");
-		return;
+		strcpy(buf, "Faculty with this ID not found\n");
+		write(sock, buf, sizeof(buf));
+		// return;
 	}
+	else{
+		strcpy(f.password, tmp.password);
+		f.activated = tmp.activated;
+		f.active = tmp.active;
 	
-	Faculty f = inputFaculty();
-	
-	strcpy(f.password, tmp.password);
-	f.activated = tmp.activated;
-	f.active = tmp.active;
-	
-	lseek(faculty_fd, (-1)*sizeof(Faculty), SEEK_CUR);
-	write(faculty_fd, &f, sizeof(f));
+		lseek(faculty_fd, (-1)*sizeof(Faculty), SEEK_CUR);
+		write(faculty_fd, &f, sizeof(f));
+	}
 	write_lock.l_type = F_UNLCK;
 	fcntl(faculty_fd, F_SETLK, &write_lock);
 	printf("Changes saved successfully\n");
+	strcpy(buf, "Changes saved successfully\n");
+	write(sock, buf, sizeof(buf));
 	close(faculty_fd);
 }
 
-void viewStudent(int ID){
+int viewStudent(int sock, int ID){
 	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Student tmp; tmp.ID = 0;
-	int num = 1;
+	int flag = 1;
 	
 	struct flock read_lock = getLock(F_RDLCK, SEEK_SET, (ID-1)*sizeof(Student), sizeof(Student)); //Acquire write lock
 	
@@ -173,18 +167,19 @@ void viewStudent(int ID){
 	read(student_fd, &tmp, sizeof(tmp));
 	if(tmp.active == false){
 		printf("Student with this ID not found\n");
-		return;
+		flag = 0;// return;
 	}
-	printStudent(tmp);
+	write(sock, (void*) &tmp, sizeof(tmp));printStudent(tmp);
 	read_lock.l_type = F_UNLCK;
 	fcntl(student_fd, F_SETLK, &read_lock);
 	close(student_fd);
+	return flag;
 }
 
-void viewFaculty(int ID){
+int viewFaculty(int sock, int ID){
 	int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Faculty tmp;tmp.ID = 0;
-	int num = 1;
+	int flag = 1;
 	
 	struct flock read_lock = getLock(F_RDLCK, SEEK_SET, (ID-1)*sizeof(Faculty), sizeof(Faculty)); //Acquire write lock
 	
@@ -195,15 +190,16 @@ void viewFaculty(int ID){
 	read(faculty_fd, &tmp, sizeof(tmp));
 	if(tmp.active == false){
 		printf("Faculty with this ID not found\n");
-		return;
+		flag = 0;// return;
 	}
-	printFaculty(tmp);
+	write(sock, (void*) &tmp, sizeof(tmp));printFaculty(tmp);
 	read_lock.l_type = F_UNLCK;
 	fcntl(faculty_fd, F_SETLK, &read_lock);
 	close(faculty_fd);
+	return flag;
 }
 
-void blockStudent(int ID){
+void blockStudent(int ID, int block, int sock){
 	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Student tmp; tmp.ID = 0;
 	int num = 1;
@@ -212,34 +208,31 @@ void blockStudent(int ID){
 	
 	printf("Fetching details...\n"); //Critical section
 	fcntl(student_fd, F_SETLKW, &write_lock);
+	char buf[1024];
 	
 	lseek(student_fd, (ID-1)*sizeof(Student), SEEK_SET);
 	read(student_fd, &tmp, sizeof(tmp));
 	if(tmp.active == false){
 		printf("Student with this ID not found\n");
-		return;
-	}
-	
-	if(tmp.blocked == false){
-		char opt;
-		printf("Student status is UNBLOCKED. Do you wish to BLOCK? (y/n): ");scanf(" %c", &opt);
-		if(opt == 'y' || opt == 'Y'){
-			tmp.blocked = true;
-			printf("Student is BLOCKED.\n");
-		}
-		else{
-			printf("Student is UNBLOCKED.\n");
-		}
+		strcpy(buf, "Student with this ID not found\n");
+		write(sock, buf, sizeof(buf));
 	}
 	else{
-		char opt;
-		printf("Student status is BLOCKED. Do you wish to UNBLOCK? (y/n): ");scanf(" %c", &opt);
-		if(opt == 'y' || opt == 'Y'){
-			tmp.blocked = false;
-			printf("Student is UNBLOCKED.\n");
+		if(block == 1){
+			if(tmp.blocked == false){
+				tmp.blocked = true;
+			}
+			printf("Student is BLOCKED.\n");
+			strcpy(buf, "Student is BLOCKED.\n");
+			write(sock, buf, sizeof(buf));
 		}
 		else{
-			printf("Student is BLOCKED.\n");
+			if(tmp.blocked == true){
+				tmp.blocked = false;
+			}
+			printf("Student is UNBLOCKED.\n");
+			strcpy(buf, "Student is UNBLOCKED.\n");
+			write(sock, buf, sizeof(buf));
 		}
 	}
 	printf("Updating details...\n");
@@ -251,10 +244,11 @@ void blockStudent(int ID){
 	close(student_fd);
 }
 
-void deleteStudent(int ID){
+void deleteStudent(int ID, int sock){
 	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Student tmp; tmp.ID = 0;
 	int num = 1;
+	char buf[1024];
 	
 	struct flock write_lock = getLock(F_WRLCK, SEEK_SET, (ID-1)*sizeof(Student), sizeof(Student)); //Acquire write lock
 	
@@ -265,23 +259,29 @@ void deleteStudent(int ID){
 	read(student_fd, &tmp, sizeof(tmp));
 	if(tmp.active == false){
 		printf("Student with this ID not found\n");
-		return;
+		strcpy(buf, "Student with this ID not found\n");
+		write(sock, buf, sizeof(buf));
+		// return;
 	}
+	else{
+		tmp.active = false;
 	
-	tmp.active = false;
-	
-	lseek(student_fd, (-1)*sizeof(Student), SEEK_CUR);
-	write(student_fd, &tmp, sizeof(tmp));
+		lseek(student_fd, (-1)*sizeof(Student), SEEK_CUR);
+		write(student_fd, &tmp, sizeof(tmp));
+	}
 	write_lock.l_type = F_UNLCK;
 	fcntl(student_fd, F_SETLK, &write_lock);
 	printf("Changes saved successfully\n");
+	strcpy(buf, "Changes saved successfully\n");
+	write(sock, buf, sizeof(buf));
 	close(student_fd);
 }
 
-void deleteFaculty(int ID){
+void deleteFaculty(int ID, int sock){
 	int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Faculty tmp;tmp.ID = 0;
 	int num = 1;
+	char buf[1024];
 	
 	struct flock write_lock = getLock(F_WRLCK, SEEK_SET, (ID-1)*sizeof(Faculty), sizeof(Faculty)); //Acquire write lock
 	
@@ -292,16 +292,21 @@ void deleteFaculty(int ID){
 	read(faculty_fd, &tmp, sizeof(tmp));
 	if(tmp.active == false){
 		printf("Faculty with this ID not found\n");
-		return;
+		strcpy(buf, "Faculty with this ID not found\n");
+		write(sock, buf, sizeof(buf));
+		// return;
 	}
+	else{
+		tmp.active = false;
 	
-	tmp.active = false;
-	
-	lseek(faculty_fd, (-1)*sizeof(Faculty), SEEK_CUR);
-	write(faculty_fd, &tmp, sizeof(tmp));
+		lseek(faculty_fd, (-1)*sizeof(Faculty), SEEK_CUR);
+		write(faculty_fd, &tmp, sizeof(tmp));
+	}
 	write_lock.l_type = F_UNLCK;
 	fcntl(faculty_fd, F_SETLK, &write_lock);
 	printf("Changes saved successfully\n");
+	strcpy(buf, "Changes saved successfully\n");
+	write(sock, buf, sizeof(buf));
 	close(faculty_fd);
 }
 
@@ -319,57 +324,66 @@ void adminDriver(Admin a, int socket_desc){
 		
 		if(opt == 0) break;
 		else if(opt == 1){
-			print("\n\n", socket_desc);// printf("\n\n");
 			Student s;
 			read(socket_desc, (void*) &s, sizeof(s));
 			addStudent(socket_desc, s);
-			print("\n\n", socket_desc);// printf("\n\n");
 		}
 		else if(opt == 2){
-			printf("Enter ID: ");scanf("%d", &ID);
-			printf("\n\n");
-			viewStudent(ID);
-			printf("\n\n");
+			read(socket_desc, &ID, sizeof(ID));
+			viewStudent(socket_desc, ID);
 		}
 		else if(opt == 3){
-			addFaculty();
-			printf("\n\n");
+			Faculty f;
+			read(socket_desc, (void*) &f, sizeof(f));
+			addFaculty(socket_desc, f);
 		}
 		else if(opt == 4){
-			printf("Enter ID: ");scanf("%d", &ID);
-			printf("\n\n");
-			viewFaculty(ID);
-			printf("\n\n");
+			read(socket_desc, &ID, sizeof(ID));
+			viewFaculty(socket_desc, ID);
 		}
 		else if(opt == 5){
-			printf("Enter ID: ");scanf("%d", &ID);
-			printf("\n\n");
-			blockStudent(ID);
-			printf("\n\n");
+			int block = -1;
+			read(socket_desc, &ID, sizeof(ID));
+			read(socket_desc, &block, sizeof(block));
+			blockStudent(ID, block, socket_desc);
 		}
 		else if(opt == 6){
-			printf("Enter ID: ");scanf("%d", &ID);
-			printf("\n\n");
-			updateStudent(ID);
-			printf("\n\n");
+			read(socket_desc, &ID, sizeof(ID));
+			int flag = viewStudent(socket_desc, ID);
+			if(flag == 1){
+				Student s;
+				read(socket_desc, (void*) &s, sizeof(s));
+				updateStudent(ID, s, socket_desc);
+			}
 		}
 		else if(opt == 7){
-			printf("Enter ID: ");scanf("%d", &ID);
-			printf("\n\n");
-			updateFaculty(ID);
-			printf("\n\n");
+			read(socket_desc, &ID, sizeof(ID));
+			int flag = viewFaculty(socket_desc, ID);
+			if(flag == 1){
+				Faculty f;
+				read(socket_desc, (void*) &f, sizeof(f));
+				updateFaculty(ID, f, socket_desc);
+			}
 		}
 		else if(opt == 8){
-			printf("Enter ID: ");scanf("%d", &ID);
-			printf("\n\n");
-			deleteStudent(ID);
-			printf("\n\n");
+			read(socket_desc, &ID, sizeof(ID));
+			int flag = viewStudent(socket_desc, ID);
+			if(flag == 1){
+				char choice;
+				read(socket_desc, &choice, sizeof(choice));
+				if(choice == 'y' || choice == 'Y')
+					deleteStudent(ID, socket_desc);
+			}
 		}
 		else if(opt == 9){
-			printf("Enter ID: ");scanf("%d", &ID);
-			printf("\n\n");
-			deleteFaculty(ID);
-			printf("\n\n");
+			read(socket_desc, &ID, sizeof(ID));
+			int flag = viewFaculty(socket_desc, ID);
+			if(flag == 1){
+				char choice;
+				read(socket_desc, &choice, sizeof(choice));
+				if(choice == 'y' || choice == 'Y')
+					deleteFaculty(ID, socket_desc);
+			}
 		}
 		else{
 			printf("Invalid option\n");

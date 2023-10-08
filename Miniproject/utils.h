@@ -93,7 +93,7 @@ char* mystrncpy(char login[20], int offset){
 }
 
 int checkUser(int role, char login[20]){
-	printf("Check: %d %s\n", role, login);
+	// printf("Check: %d %s\n", role, login);
 	if(role == 1){
 		int admin_fd = open(admin_file, O_RDWR|O_CREAT, S_IRWXU);
 		Admin a;
@@ -107,7 +107,7 @@ int checkUser(int role, char login[20]){
 	else if(role == 2){
 		char *s = mystrncpy(login, 4); 
 		int loginID = atoi(s);
-		printf("LoginID: %d\n", loginID);
+		// printf("LoginID: %d\n", loginID);
 		int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 		Faculty tmp;
 		while(read(faculty_fd, &tmp, sizeof(tmp)))
@@ -120,7 +120,7 @@ int checkUser(int role, char login[20]){
 	else{
 		char *s = mystrncpy(login, 2); 
 		int loginID = atoi(s);
-		printf("LoginID: %d\n", loginID);
+		// printf("LoginID: %d\n", loginID);
 		int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 		Student tmp;
 		while(read(student_fd, &tmp, sizeof(tmp)))
@@ -134,9 +134,9 @@ int checkUser(int role, char login[20]){
 }
 
 int* validateCreds(int role, char login[20], char password[30]){
-	printf("Validate: %d %s %s\n", role, login, password);
+	// printf("Validate: %d %s %s\n", role, login, password);
 	if(role == 1){
-		printf("admin\n");
+		// printf("admin\n");
 		int admin_fd = open(admin_file, O_RDWR|O_CREAT, S_IRWXU);
 		Admin a;
 		read(admin_fd, &a, sizeof(a));
@@ -149,14 +149,14 @@ int* validateCreds(int role, char login[20], char password[30]){
 		close(admin_fd);
 	}
 	else if(role == 2){
-		printf("faculty\n");
+		// printf("faculty\n");
 		char *s = mystrncpy(login, 4); 
 		int loginID = atoi(s);
 		
 		int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 		Faculty tmp;
 		while(read(faculty_fd, &tmp, sizeof(tmp))){
-			printf("Faculty password: %s %s \n", password, tmp.password);
+			// printf("Faculty password: %s %s \n", password, tmp.password);
 			if(loginID == tmp.ID && strcmp(password, tmp.password) == 0 && tmp.active){
 				close(faculty_fd);
 				int *arr = calloc(2, sizeof(int));
@@ -167,7 +167,7 @@ int* validateCreds(int role, char login[20], char password[30]){
 		close(faculty_fd);
 	}
 	else{
-		printf("student\n");
+		// printf("student\n");
 		char *s = mystrncpy(login, 2); 
 		int loginID = atoi(s);
 		
@@ -211,38 +211,18 @@ int* mainMenu(){
 		return arr;
 	}
 	
-	char login[20], password[30];
+	char login[20];
 	printf("Enter login ID: "); scanf(" %[^\n]", login);
 	int flag = checkUser(role, login);
-	printf("Flag %d\n", flag);
+	// printf("Flag %d\n", flag);
 	if(flag == -1){
 		int *arr = calloc(2, sizeof(int));
 		arr[0] = flag; arr[1] = 0;
 		return arr;
 	}
-	/*
-	printf("Enter password: "); 
-	char ch = 'a';int ix = 0;
-	while(1){
-		ch = getch();
-		if(ch == '\n') break;
-		else if(ch == '\b'){
-			ix--;
-			if(ix<0)ix = 0;
-		}
-		else{
-			password[ix++] = ch;
-		}
-	}
-	password[ix] = '\0';*/
+	char *password = getpass("Enter password: ");
 	
-	/*
-	noecho();
-	scanf(" %[^\n]", password);
-	echo();*/
-	char *passwod = getpass("Enter password: ");
-	
-	return validateCreds(role, login, passwod);
+	return validateCreds(role, login, password);
 }
 
 void print(char *buf, int sock){

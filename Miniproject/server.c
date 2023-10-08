@@ -17,6 +17,7 @@ void *update(void *parameters){
 	//read(params->csd, params->buf, sizeof(params->buf));
 	//printf("%s\n", buf);
 	//Check end of connection
+	bzero(params->buf, sizeof(params->buf));
 	if(strcmp(params->buf, "exit") == 0){
 		getpeername(params->csd, (struct sockaddr*)&params->cli,&params->len);
 		printf("\nClient disconnected. Socket: %d.\n",params->client_sockets[params->ix]);
@@ -49,7 +50,7 @@ void *update(void *parameters){
 			strcpy(params->buf, "Logged in as Admin \n");
 			write(params->new_fd, params->buf, sizeof(params->buf));
 			Admin a = getAdmin();
-			write(params->new_fd, (void*) &a, sizeof(a));
+			// write(params->new_fd, (void*) &a, sizeof(a));
 			adminDriver(a, params->new_fd);
 		}
 		else if(role[0] == 2){
@@ -69,7 +70,6 @@ void *update(void *parameters){
 		
 		printf("\nMessage from Client %d: %s\n", params->client_sockets[params->ix], params->buf);
 		
-		bzero(params->buf, sizeof(params->buf));
 		/*//Write message in buffer
 		printf("\nEnter message: ");scanf(" %[^\n]", params->buf);
 		write(params->new_fd, params->buf, sizeof(params->buf));*/
