@@ -109,7 +109,10 @@ void enrollCourse(Student s){
 	printf("Do you want to enroll in the above course? (y/n)");scanf(" %c", &opt);
 	if(opt == 'y' || opt == 'Y'){
 		int flag = checkEnrollment(s, tmp);
-		if(flag == 1){
+		if(s.blocked == true){
+			printf("You are blocked currently. Please contact the admin. \n");
+		}
+		else if(flag == 1){
 			printf("You have already enrolled in this course. \n");
 		}
 		else if(tmp.available_seat_count <= 0){
@@ -166,7 +169,10 @@ void unenrollCourse(Student s){
 	if(opt == 'y' || opt == 'Y'){
 		Course dummy; dummy.code = choice;
 		int flag = checkEnrollment(s, dummy);
-		if(flag == 0){
+		if(s.blocked == true){
+			printf("You are blocked currently. Please contact the admin. \n");
+		}
+		else if(flag == 0){
 			printf("You have not enrolled in this course. \n");
 		}
 		else{

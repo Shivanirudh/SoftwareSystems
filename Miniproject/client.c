@@ -25,7 +25,7 @@ int main(){
 	while(1){
 		
 		int *role = mainMenu();
-		printf("Client: %d %d\n", role[0], role[1]);
+		// printf("Client: %d %d\n", role[0], role[1]);
 		write(sd, role, sizeof(role));
 		
 		

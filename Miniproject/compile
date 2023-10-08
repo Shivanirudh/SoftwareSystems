@@ -1,0 +1,9 @@
+#!/bin/bash
+
+gcc structures.h
+gcc utils.h
+gcc admin_ops.h
+gcc faculty_ops.h
+gcc student_ops.h
+gcc server.c -lpthread -lncurses -o server
+gcc client.c -lpthread -lncurses -o client
