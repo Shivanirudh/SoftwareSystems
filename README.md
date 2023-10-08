@@ -11,6 +11,7 @@ Contains shell scripts written as part of classwork
 
 ## [Tutorials](https://github.com/Shivanirudh/SoftwareSystems/tree/main/Tutorials)
 Contains shell script for employee management program as part of classwork
+* [employee.sh](https://github.com/Shivanirudh/SoftwareSystems/blob/main/Tutorials/employee.sh)
 
 ## [Hands-On](https://github.com/Shivanirudh/SoftwareSystems/tree/main/HandsOn)
 Contains all programs completed as part of the Hands On list 1
@@ -20,3 +21,11 @@ Contains all programs completed as part of the Hands On list 2
 
 ## [Miniproject](https://github.com/Shivanirudh/SoftwareSystems/tree/main/Miniproject)
 Contains all code files for the miniproject
+* [init.c](https://github.com/Shivanirudh/SoftwareSystems/blob/main/Miniproject/init.c)
+* [structures.h](https://github.com/Shivanirudh/SoftwareSystems/blob/main/Miniproject/structures.h)
+* [utils.h](https://github.com/Shivanirudh/SoftwareSystems/blob/main/Miniproject/utils.h)
+* [admin_ops.h](https://github.com/Shivanirudh/SoftwareSystems/blob/main/Miniproject/admin_ops.h)
+* [faculty_ops.h](https://github.com/Shivanirudh/SoftwareSystems/blob/main/Miniproject/faculty_ops.h)
+* [student_ops.h](https://github.com/Shivanirudh/SoftwareSystems/blob/main/Miniproject/student_ops.h)
+* [server.c](https://github.com/Shivanirudh/SoftwareSystems/blob/main/Miniproject/server.c)
+* [client.c](https://github.com/Shivanirudh/SoftwareSystems/blob/main/Miniproject/client.c)
