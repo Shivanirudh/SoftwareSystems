@@ -30,25 +30,9 @@ int main() {
     char message[1024];
 	int *role = calloc(2, sizeof(int));
     while (1) {
-        // printf("Enter a message: ");
-        // fgets(message, sizeof(message), stdin);
-        // if (strlen(message) <= 1) {
-        //     continue; // Skip empty messages
-        // }
+
 		role = mainMenu();
 
-        // Send the message to the server
-        // write(client_socket, message, strlen(message));
-		write(client_socket, role, sizeof(role));
-
-        // Receive and print the response from the server
-        // int bytes_received = read(client_socket, message, sizeof(message));
-        // if (bytes_received <= 0) {
-        //     perror("Connection closed by server");
-        //     break;
-        // }
-        // message[bytes_received] = '\0';
-        // printf("Server response: %s", message);
 		read(client_socket, message, sizeof(message));
 		printf("Server response: %s", message);
 		if(strcmp(message, "Invalid Credentials!!!\n") == 0 || strcmp(message, "That login ID does not exist for that role. \n") == 0)
@@ -73,7 +57,7 @@ int main() {
 			Combined combine;
 
 			if(role[0] == 1){
-				// printf("Welcome Mr. %s\n\n", "Vishnu Raj");
+
 				combine.role = 1;
 				int opt;
 				adminMenuDisplay();
@@ -233,7 +217,7 @@ int main() {
 				}
 			}
 			else if(role[0] == 2){
-				// read(client_socket, &combine.f, sizeof(combine.f));
+
 				combine.role = 2;
 				combine.f = comb.f;
 				printf("Welcome Prof. %s\n\n", combine.f.name);
@@ -286,10 +270,6 @@ int main() {
 						}
 						else{
 							Course temp;
-							// for(int i =0;i<count;i++){
-							// 	read(client_socket, (void*)&temp, sizeof(temp));
-							// 	printCourse(temp);
-							// }
 							while(count--){
 								read(client_socket, (void*)&temp, sizeof(temp));
 								printCourse(temp);

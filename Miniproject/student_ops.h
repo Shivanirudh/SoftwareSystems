@@ -200,49 +200,6 @@ void passwordChangeStudent(int ID, bool first_time, char password[1024]){
 	close(student_fd);
 }
 
-// void studentDriver(Student s){
-// 	printf("Welcome %s\n\n", s.name);
-// 	if(s.activated == false){
-// 		printf("You are logging in for the first time. Please change password. \n");
-// 		printf("\n\n");
-// 		passwordChangeStudent(s.ID, true);
-// 		printf("\n\n");
-// 	}
-// 	else{
-// 		int opt = -1;
-// 		while(1){
-// 			int code;
-// 			studentMenuDisplay();
-// 			printf("Enter choice: ");scanf("%d", &opt);
-			
-// 			if(opt == 0) break;
-// 			else if(opt == 1){
-// 				printf("\n\n");
-// 				enrollCourse(s);
-// 				printf("\n\n");
-// 			}
-// 			else if(opt == 2){
-// 				printf("\n\n");
-// 				unenrollCourse(s);
-// 				printf("\n\n");
-// 			}
-// 			else if(opt == 3){
-// 				printf("\n\n");
-// 				viewEnrolledCourses(s);
-// 				printf("\n\n");
-// 			}
-// 			else if(opt == 4){
-// 				printf("\n\n");
-// 				passwordChangeStudent(s.ID, false);
-// 				printf("\n\n");
-// 			}
-// 			else{
-// 				printf("Invalid option\n");
-// 			}
-// 		}
-// 	}
-// }
-
 //Testing driver code
 /*
 int main(){
