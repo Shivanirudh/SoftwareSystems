@@ -1,3 +1,8 @@
+/*
+Author: Shivanirudh S G
+File description: All operations that can be carried out by the admin
+*/
+
 #include "utils.h"
 
 void adminMenuDisplay(){
@@ -17,14 +22,9 @@ void adminMenuDisplay(){
 	printf("0. Logout\n");
 }
 
-/*
-	Most functions in this file work on a full DB basis, including addition and deletion of records. For that reason all the locks acquired for this perform mandatory locking. 
-	The exception to this are the updation and view functionalities, which perform advisory locking on just the record that is to be updated/viewed. 
-*/
-
-void addStudent(){
+int addStudent(Student s){
 	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
-	Student s = inputStudent();
+	// Student s = inputStudent();
 	Student tmp;
 	int num = 1;
 	
@@ -49,16 +49,14 @@ void addStudent(){
 	write(student_fd, &s, sizeof(s));
 	write_lock.l_type = F_UNLCK;
 	fcntl(student_fd, F_SETLK, &write_lock);
-	printf("Saved successfully\n");
-	printf("Student's Login ID: MT%d\n", s.ID);
-	printf("One time Password: MT%d\n", s.ID);
-	printf("Note: Student will be forced to change password on the first login. \n");
+	
 	close(student_fd);
+	return s.ID;
 }
 
-void addFaculty(){
+int addFaculty(Faculty f){
 	int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
-	Faculty f = inputFaculty();
+	// Faculty f = inputFaculty();
 	Faculty tmp;
 	int num = 1;
 	
@@ -83,14 +81,12 @@ void addFaculty(){
 	write(faculty_fd, &f, sizeof(f));
 	write_lock.l_type = F_UNLCK;
 	fcntl(faculty_fd, F_SETLK, &write_lock);
-	printf("Saved successfully\n");
-	printf("Faculty Login ID: PROF%d\n", f.ID);
-	printf("One time Password: PROF%d\n", f.ID);
-	printf("Note: Faculty will be forced to change password on the first login. \n");
+	
 	close(faculty_fd);
+	return f.ID;
 }
 
-void updateStudent(int ID){
+void updateStudent(int ID, Student s){
 	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Student tmp; tmp.ID = 0;
 	int num = 1;
@@ -102,17 +98,12 @@ void updateStudent(int ID){
 	
 	lseek(student_fd, (ID-1)*sizeof(Student), SEEK_SET);
 	read(student_fd, &tmp, sizeof(tmp));
-	if(tmp.active == false){
-		printf("Student with this ID not found\n");
-		return;
-	}
-	
-	Student s = inputStudent();
 	
 	strcpy(s.password, tmp.password);
 	s.activated = tmp.activated;
 	s.blocked = tmp.blocked; 
 	s.active = tmp.active;
+	s.courseCount = tmp.courseCount;
 	
 	lseek(student_fd, (-1)*sizeof(Student), SEEK_CUR);
 	write(student_fd, &s, sizeof(s));
@@ -122,7 +113,7 @@ void updateStudent(int ID){
 	close(student_fd);
 }
 
-void updateFaculty(int ID){
+void updateFaculty(int ID, Faculty f){
 	int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 	Faculty tmp;tmp.ID = 0;
 	int num = 1;
@@ -134,12 +125,6 @@ void updateFaculty(int ID){
 	
 	lseek(faculty_fd, (ID-1)*sizeof(Faculty), SEEK_SET);
 	read(faculty_fd, &tmp, sizeof(tmp));
-	if(tmp.active == false){
-		printf("Faculty with this ID not found\n");
-		return;
-	}
-	
-	Faculty f = inputFaculty();
 	
 	strcpy(f.password, tmp.password);
 	f.activated = tmp.activated;
@@ -209,33 +194,8 @@ void blockStudent(int ID){
 	
 	lseek(student_fd, (ID-1)*sizeof(Student), SEEK_SET);
 	read(student_fd, &tmp, sizeof(tmp));
-	if(tmp.active == false){
-		printf("Student with this ID not found\n");
-		return;
-	}
 	
-	if(tmp.blocked == false){
-		char opt;
-		printf("Student status is UNBLOCKED. Do you wish to BLOCK? (y/n): ");scanf(" %c", &opt);
-		if(opt == 'y' || opt == 'Y'){
-			tmp.blocked = true;
-			printf("Student is BLOCKED.\n");
-		}
-		else{
-			printf("Student is UNBLOCKED.\n");
-		}
-	}
-	else{
-		char opt;
-		printf("Student status is BLOCKED. Do you wish to UNBLOCK? (y/n): ");scanf(" %c", &opt);
-		if(opt == 'y' || opt == 'Y'){
-			tmp.blocked = false;
-			printf("Student is UNBLOCKED.\n");
-		}
-		else{
-			printf("Student is BLOCKED.\n");
-		}
-	}
+	tmp.blocked = (tmp.blocked)?false:true;
 	printf("Updating details...\n");
 	lseek(student_fd, (-1)*sizeof(Student), SEEK_CUR);
 	write(student_fd, &tmp, sizeof(tmp));
@@ -257,11 +217,7 @@ void deleteStudent(int ID){
 	
 	lseek(student_fd, (ID-1)*sizeof(Student), SEEK_SET);
 	read(student_fd, &tmp, sizeof(tmp));
-	if(tmp.active == false){
-		printf("Student with this ID not found\n");
-		return;
-	}
-	
+
 	tmp.active = false;
 	
 	lseek(student_fd, (-1)*sizeof(Student), SEEK_CUR);
@@ -284,10 +240,6 @@ void deleteFaculty(int ID){
 	
 	lseek(faculty_fd, (ID-1)*sizeof(Faculty), SEEK_SET);
 	read(faculty_fd, &tmp, sizeof(tmp));
-	if(tmp.active == false){
-		printf("Faculty with this ID not found\n");
-		return;
-	}
 	
 	tmp.active = false;
 	
@@ -299,71 +251,71 @@ void deleteFaculty(int ID){
 	close(faculty_fd);
 }
 
-void adminDriver(Admin a){
-	printf("Welcome Mr. %s\n\n", "Vishnu Raj");
-	int opt = -1;
-	while(1){
-		int ID;
-		adminMenuDisplay();
-		printf("Enter choice: ");scanf("%d", &opt);
+// void adminDriver(Admin a){
+// 	printf("Welcome Mr. %s\n\n", "Vishnu Raj");
+// 	int opt = -1;
+// 	while(1){
+// 		int ID;
+// 		adminMenuDisplay();
+// 		printf("Enter choice: ");scanf("%d", &opt);
 		
-		if(opt == 0) break;
-		else if(opt == 1){
-			printf("\n\n");
-			addStudent();
-			printf("\n\n");
-		}
-		else if(opt == 2){
-			printf("Enter ID: ");scanf("%d", &ID);
-			printf("\n\n");
-			viewStudent(ID);
-			printf("\n\n");
-		}
-		else if(opt == 3){
-			addFaculty();
-			printf("\n\n");
-		}
-		else if(opt == 4){
-			printf("Enter ID: ");scanf("%d", &ID);
-			printf("\n\n");
-			viewFaculty(ID);
-			printf("\n\n");
-		}
-		else if(opt == 5){
-			printf("Enter ID: ");scanf("%d", &ID);
-			printf("\n\n");
-			blockStudent(ID);
-			printf("\n\n");
-		}
-		else if(opt == 6){
-			printf("Enter ID: ");scanf("%d", &ID);
-			printf("\n\n");
-			updateStudent(ID);
-			printf("\n\n");
-		}
-		else if(opt == 7){
-			printf("Enter ID: ");scanf("%d", &ID);
-			printf("\n\n");
-			updateFaculty(ID);
-			printf("\n\n");
-		}
-		else if(opt == 8){
-			printf("Enter ID: ");scanf("%d", &ID);
-			printf("\n\n");
-			deleteStudent(ID);
-			printf("\n\n");
-		}
-		else if(opt == 9){
-			printf("Enter ID: ");scanf("%d", &ID);
-			printf("\n\n");
-			deleteFaculty(ID);
-			printf("\n\n");
-		}
-		else{
-			printf("Invalid option\n");
-		}
-	}
-}
+// 		if(opt == 0) break;
+// 		else if(opt == 1){
+// 			printf("\n\n");
+// 			addStudent();
+// 			printf("\n\n");
+// 		}
+// 		else if(opt == 2){
+// 			printf("Enter ID: ");scanf("%d", &ID);
+// 			printf("\n\n");
+// 			viewStudent(ID);
+// 			printf("\n\n");
+// 		}
+// 		else if(opt == 3){
+// 			addFaculty();
+// 			printf("\n\n");
+// 		}
+// 		else if(opt == 4){
+// 			printf("Enter ID: ");scanf("%d", &ID);
+// 			printf("\n\n");
+// 			viewFaculty(ID);
+// 			printf("\n\n");
+// 		}
+// 		else if(opt == 5){
+// 			printf("Enter ID: ");scanf("%d", &ID);
+// 			printf("\n\n");
+// 			blockStudent(ID);
+// 			printf("\n\n");
+// 		}
+// 		else if(opt == 6){
+// 			printf("Enter ID: ");scanf("%d", &ID);
+// 			printf("\n\n");
+// 			updateStudent(ID);
+// 			printf("\n\n");
+// 		}
+// 		else if(opt == 7){
+// 			printf("Enter ID: ");scanf("%d", &ID);
+// 			printf("\n\n");
+// 			updateFaculty(ID);
+// 			printf("\n\n");
+// 		}
+// 		else if(opt == 8){
+// 			printf("Enter ID: ");scanf("%d", &ID);
+// 			printf("\n\n");
+// 			deleteStudent(ID);
+// 			printf("\n\n");
+// 		}
+// 		else if(opt == 9){
+// 			printf("Enter ID: ");scanf("%d", &ID);
+// 			printf("\n\n");
+// 			deleteFaculty(ID);
+// 			printf("\n\n");
+// 		}
+// 		else{
+// 			printf("Invalid option\n");
+// 		}
+// 	}
+// }
 
 //Testing driver code
 /*

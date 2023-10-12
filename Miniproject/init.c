@@ -1,3 +1,7 @@
+/*
+Author: Shivanirudh S G
+File description: Creation of admin credentials
+*/
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>

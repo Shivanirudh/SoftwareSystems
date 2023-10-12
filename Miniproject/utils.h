@@ -1,3 +1,8 @@
+/*
+Author: Shivanirudh S G
+File description: Low level functions for fetching objects of certain struct, authorisation and other miscellaneous functions for accessibilty across all files
+*/
+
 #include "structures.h"
 
 struct flock getLock(short l_type, short l_whence, off_t l_start, off_t l_len){
@@ -8,28 +13,6 @@ struct flock getLock(short l_type, short l_whence, off_t l_start, off_t l_len){
 	mylock.l_len = l_len;
 	mylock.l_pid = getpid();
 	return mylock;
-}
-
-ssize_t my_getpass (char **lineptr, size_t *n, FILE *stream)
-{
-  struct termios old, new;
-  int nread;
-
-  /* Turn echoing off and fail if we can’t. */
-  if (tcgetattr (fileno (stream), &old) != 0)
-    return -1;
-  new = old;
-  new.c_lflag &= ~ECHO;
-  if (tcsetattr (fileno (stream), TCSAFLUSH, &new) != 0)
-    return -1;
-
-  /* Read the passphrase */
-  nread = getline (lineptr, n, stream);
-
-  /* Restore terminal. */
-  (void) tcsetattr (fileno (stream), TCSAFLUSH, &old);
-
-  return nread;
 }
 
 Admin getAdmin(){
@@ -54,7 +37,7 @@ Student getStudent(int ID){
 	read(student_fd, &tmp, sizeof(tmp));
 	if(tmp.active == false){
 		printf("Student with this ID not found\n");
-		return tmp;
+		// return tmp;
 	}
 	read_lock.l_type = F_UNLCK;
 	fcntl(student_fd, F_SETLK, &read_lock);
@@ -76,7 +59,7 @@ Faculty getFaculty(int ID){
 	read(faculty_fd, &tmp, sizeof(tmp));
 	if(tmp.active == false){
 		printf("Faculty with this ID not found\n");
-		return tmp;
+		// return tmp;
 	}
 	read_lock.l_type = F_UNLCK;
 	fcntl(faculty_fd, F_SETLK, &read_lock);
@@ -98,7 +81,7 @@ Course getCourse(int code){
 	read(course_fd, &tmp, sizeof(tmp));
 	if(tmp.active == false){
 		printf("Course with this code not found\n");
-		return tmp;
+		// return tmp;
 	}
 	read_lock.l_type = F_UNLCK;
 	fcntl(course_fd, F_SETLK, &read_lock);
@@ -115,7 +98,7 @@ char* mystrncpy(char login[20], int offset){
 }
 
 int checkUser(int role, char login[20]){
-	// printf("Check: %d %s\n", role, login);
+	printf("Check: %d %s\n", role, login);
 	if(role == 1){
 		int admin_fd = open(admin_file, O_RDWR|O_CREAT, S_IRWXU);
 		Admin a;
@@ -139,17 +122,19 @@ int checkUser(int role, char login[20]){
 			}
 		close(faculty_fd);
 	}
-	else{
+	else if(role == 3){
 		char *s = mystrncpy(login, 2); 
 		int loginID = atoi(s);
-		// printf("LoginID: %d\n", loginID);
+		printf("LoginID: %d\n", loginID);
 		int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 		Student tmp;
 		while(read(student_fd, &tmp, sizeof(tmp)))
+			printf("%d - ", tmp.ID);
 			if(loginID == tmp.ID && tmp.active){
 				close(student_fd);
 				return role;
 			}
+			printf("\n");
 		close(student_fd);
 	}
 	return -1;
@@ -233,7 +218,7 @@ int* mainMenu(){
 		return arr;
 	}
 	
-	char login[20], password[30];
+	char login[20];
 	printf("Enter login ID: "); scanf(" %[^\n]", login);
 	int flag = checkUser(role, login);
 	printf("Flag %d\n", flag);
@@ -242,27 +227,131 @@ int* mainMenu(){
 		arr[0] = flag; arr[1] = 0;
 		return arr;
 	}
-	/*
-	printf("Enter password: "); 
-	char ch = 'a';int ix = 0;
-	while(1){
-		ch = getch();
-		if(ch == '\n') break;
-		else if(ch == '\b'){
-			ix--;
-			if(ix<0)ix = 0;
-		}
-		else{
-			password[ix++] = ch;
+	char *password = getpass("Enter password: ");
+	
+	return validateCreds(role, login, password);
+}
+
+void updateCourse(int code, int value){
+	int course_fd = open(course_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
+	Course tmp; 
+	
+	struct flock write_lock = getLock(F_WRLCK, SEEK_SET, (code-1)*sizeof(Course), sizeof(Course)); //Acquire write lock
+	
+	printf("Updating course details...\n"); //Critical section
+	fcntl(course_fd, F_SETLKW, &write_lock);
+	
+	lseek(course_fd, (code-1)*sizeof(Course), SEEK_SET);
+	read(course_fd, &tmp, sizeof(tmp));
+	if(tmp.active == false){
+		printf("Course with this code not found\n");
+		return;
+	}
+	
+	tmp.available_seat_count += value;
+	
+	lseek(course_fd, (-1)*sizeof(Course), SEEK_CUR);
+	write(course_fd, &tmp, sizeof(tmp));
+	write_lock.l_type = F_UNLCK;
+	fcntl(course_fd, F_SETLK, &write_lock);
+	printf("Changes saved successfully\n");
+	close(course_fd);
+}
+
+void studentCourseCount(int ID, int value){
+	int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
+	Student tmp; tmp.ID = 0;
+	int num = 1;
+	
+	struct flock write_lock = getLock(F_WRLCK, SEEK_SET, (ID-1)*sizeof(Student), sizeof(Student)); //Acquire write lock
+	
+	printf("Fetching updated details...\n"); //Critical section
+	fcntl(student_fd, F_SETLKW, &write_lock);
+	
+	lseek(student_fd, (ID-1)*sizeof(Student), SEEK_SET);
+	read(student_fd, &tmp, sizeof(tmp));
+	
+	tmp.courseCount += value;
+	
+	lseek(student_fd, (-1)*sizeof(Student), SEEK_CUR);
+	write(student_fd, &tmp, sizeof(tmp));
+	write_lock.l_type = F_UNLCK;
+	fcntl(student_fd, F_SETLK, &write_lock);
+	printf("Changes saved successfully\n");
+	close(student_fd);
+}
+
+void autoUnenroll(Course c, int count){
+	int student_course_fd = open(student_course_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
+	Enrollment tmp;
+	
+	struct flock write_lock = getLock(F_WRLCK, SEEK_SET, 0, 0); //Acquire write lock
+
+	
+	printf("Fetching details...\n"); //Critical section
+	fcntl(student_course_fd, F_SETLKW, &write_lock);
+	if(count < 0){
+		lseek(student_course_fd, (-1)*sizeof(Enrollment), SEEK_END);
+		while(count < 0){
+			read(student_course_fd, &tmp, sizeof(tmp));
+			if(tmp.c.code == c.code){
+				lseek(student_course_fd, (-1)*sizeof(Enrollment), SEEK_CUR);
+				tmp.active = false;
+				write(student_course_fd, &tmp, sizeof(tmp));
+				updateCourse(tmp.c.code, 1);
+				studentCourseCount(tmp.s.ID, -1);
+				count++;
+			}
+			lseek(student_course_fd, -2*sizeof(Enrollment), SEEK_CUR);
 		}
 	}
-	password[ix] = '\0';*/
+	else{
+		while(read(student_course_fd, &tmp, sizeof(tmp))){
+			if(tmp.c.code == c.code){
+				lseek(student_course_fd, (-1)*sizeof(Enrollment), SEEK_CUR);
+				tmp.active = false;
+				write(student_course_fd, &tmp, sizeof(tmp));
+				updateCourse(tmp.c.code, 1);
+				studentCourseCount(tmp.s.ID, -1);
+			}
+		}
+	}
+
+	write_lock.l_type = F_UNLCK;
+	fcntl(student_course_fd, F_SETLK, &write_lock);
+	printf("Changes saved successfully\n");
+	close(student_course_fd);
+}
+
+void checkCourseStatus(){
+	int course_fd = open(course_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
+	Course tmp; 
 	
-	/*
-	noecho();
-	scanf(" %[^\n]", password);
-	echo();*/
-	char *passwod = getpass("Enter password: ");
+	struct flock write_lock = getLock(F_WRLCK, SEEK_SET, 0, 0); //Acquire write lock
 	
-	return validateCreds(role, login, passwod);
+	printf("Fetching updated details...\n"); //Critical section
+	fcntl(course_fd, F_SETLKW, &write_lock);
+	
+	while(read(course_fd, &tmp, sizeof(tmp))){
+		if(tmp.available_seat_count < 0){
+			autoUnenroll(tmp, tmp.available_seat_count);
+			tmp.available_seat_count = 0;
+	
+			lseek(course_fd, (-1)*sizeof(Course), SEEK_CUR);
+			write(course_fd, &tmp, sizeof(tmp));
+		}
+
+	}
+
+	write_lock.l_type = F_UNLCK;
+	fcntl(course_fd, F_SETLK, &write_lock);
+	printf("Changes saved successfully\n");
+	close(course_fd);
+}
+
+void courseRemoval(int code){
+	Course c = getCourse(code);
+	if(c.active == false){
+		autoUnenroll(c, 0);
+	}	
 }

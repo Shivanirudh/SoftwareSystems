@@ -1,3 +1,7 @@
+/*
+Author: Shivanirudh S G
+File description: Constants, Base structures for storing into files (Faculty, Student, Course, Enrollment) and their correspodning input/output functions
+*/
 #include<stdio.h>
 #include<curses.h>
 #include<ncurses.h>
@@ -22,7 +26,10 @@
 #define delimiter1 "-----------------------------------------"
 #define delimiter2 "_____________________________________________________________________"
 
-#define PORT_NO 8008
+#define MAX_CLIENTS 5
+#define PORT 8008
+#define COURSE_LIMIT 10
+#define SERVER_IP "127.0.0.1"
 
 #define admin_file "admin_creds.bin"
 #define student_file "students.bin"
@@ -42,6 +49,7 @@ typedef struct Course{
 	char name[50];
 	char department[50];
 	char faculty_name[30];
+	int faculty_id;
 	int credits;
 	int total_seat_count;
 	int available_seat_count;
@@ -57,6 +65,8 @@ typedef struct Student{
 	bool activated;
 	bool blocked;
 	bool active;
+	int courseCount;
+	int courses[COURSE_LIMIT];
 } Student;
 
 typedef struct Faculty{
@@ -74,6 +84,19 @@ typedef struct Enrollment{
 	bool active;
 } Enrollment;
 
+typedef struct Combined{
+	int role;
+	int action;
+	int ID;
+	int code;
+	char choice;
+	char password[1024];
+	Student s;
+	Faculty f;
+	Course c;
+} Combined;
+
+
 Student inputStudent(){
 	Student s;
 	printf("Enter name: ");scanf(" %[^\n]", s.name);
@@ -82,6 +105,7 @@ Student inputStudent(){
 	s.activated = false;
 	s.blocked = false;
 	s.active = true;
+	s.courseCount = 0;
 	
 	return s;
 }
@@ -140,12 +164,5 @@ void printCourse(Course c){
 	printf("Available seats: %d\n", c.available_seat_count);
 	printf("%s\n", delimiter1);
 }
-/*
-int admin_fd = open(admin_file, O_RDWR|O_CREAT, S_IRWXU);
-int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
-int faculty_fd = open(faculty_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
-int course_fd = open(course_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
-int student_course_fd = open(student_course_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
-*/
 
 
