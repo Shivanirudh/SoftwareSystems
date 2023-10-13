@@ -32,7 +32,7 @@ int main() {
     while (1) {
 
 		role = mainMenu();
-
+		write(client_socket, role, sizeof(role));
 		read(client_socket, message, sizeof(message));
 		printf("Server response: %s", message);
 		if(strcmp(message, "Invalid Credentials!!!\n") == 0 || strcmp(message, "That login ID does not exist for that role. \n") == 0)
@@ -373,7 +373,7 @@ int main() {
 						printCourse(combine.c);
 						printf("Do you want to enroll in the above course? (y/n)");scanf(" %c", &combine.choice);
 						write(client_socket, (void*)&combine, sizeof(combine));
-						write(client_socket, message, sizeof(message));
+						read(client_socket, message, sizeof(message));
 						printf("Message from server: %s", message);
 
 						printf("\n\n");
@@ -420,7 +420,7 @@ int main() {
 							printCourse(combine.c);
 							printf("Do you want to unenroll from the above course? (y/n)");scanf(" %c", &combine.choice);
 							write(client_socket, (void*)&combine, sizeof(combine));
-							write(client_socket, message, sizeof(message));
+							read(client_socket, message, sizeof(message));
 							printf("Message from server: %s", message);
 						}
 

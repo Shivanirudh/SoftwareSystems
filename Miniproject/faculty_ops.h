@@ -124,16 +124,17 @@ void modifyCourse(int code, Course c){
 	
 	lseek(course_fd, (code-1)*sizeof(Course), SEEK_SET);
 	read(course_fd, &tmp, sizeof(tmp));
+	c.available_seat_count = tmp.available_seat_count;
 	
 	if(c.total_seat_count > tmp.total_seat_count)
 		c.available_seat_count += (c.total_seat_count - tmp.total_seat_count);
 	else{
-		c.available_seat_count -= (c.total_seat_count - tmp.total_seat_count);
-		// c.available_seat_count = (c.available_seat_count < 0)? 0:c.available_seat_count; 
+		c.available_seat_count += (c.total_seat_count - tmp.total_seat_count);
+		
 	}
 
 	c.code = tmp.code;
-	// c.available_seat_count = tmp.available_seat_count;
+ 
 	c.active = tmp.active;
 	strcpy(c.faculty_name, tmp.faculty_name);
 	c.faculty_id = tmp.faculty_id;

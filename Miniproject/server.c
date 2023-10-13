@@ -204,25 +204,31 @@ void handle_client(int client_socket) {
 				else{
 					if(combine.action == 1){
 						int ret_val = 0;
+						char buf[1024];
+						bzero(buf, sizeof(buf));
 						printf("Enroll in a course\n");
 						Course c = getCourse(combine.code);
 						write(client_socket, (void*)&c, sizeof(c));
 						read(client_socket, (void*)&combine, sizeof(combine));
 						if(combine.choice == 'y' || combine.choice=='Y'){
 							ret_val = enrollCourse(combine.s, c);
+							printf("Enroll ret val: %d\n", ret_val);
 							if(ret_val == 0)
-								strcpy(buffer, "Enrolled successfully \n");
+								strcpy(buf, "Enrolled successfully \n");
 							else if(ret_val == -1)
-								strcpy(buffer, "No seats available for this course. \n");
+								strcpy(buf, "No seats available for this course. \n");
 							else if(ret_val == -2)
-								strcpy(buffer, "You have already enrolled in this course. \n");
+								strcpy(buf, "You have already enrolled in this course. \n");
 							else if(ret_val == -3)
-								strcpy(buffer, "You are blocked currently. Please contact the admin. \n");
+								strcpy(buf, "You are blocked currently. Please contact the admin. \n");
+							printf("Message: %s\n", buf);
+							write(client_socket, buf, sizeof(buf));
 						}
 						else{
-							strcpy(buffer, "Operation cancelled \n");
+							strcpy(buf, "Operation cancelled \n");
+							printf("Message: %s\n", buf);
+							write(client_socket, buf, sizeof(buf));
 						}
-						write(client_socket, buffer, sizeof(buffer));
 					}
 					else if(combine.action == 2){
 						printf("View my enrolled courses\n");
@@ -268,6 +274,7 @@ void handle_client(int client_socket) {
 							else{
 								strcpy(buffer, "Operation cancelled \n");
 							}
+							write(client_socket, buffer, sizeof(buffer));
 						}
 						
 					}

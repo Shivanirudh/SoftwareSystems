@@ -98,7 +98,7 @@ char* mystrncpy(char login[20], int offset){
 }
 
 int checkUser(int role, char login[20]){
-	printf("Check: %d %s\n", role, login);
+	// printf("Check: %d %s\n", role, login);
 	if(role == 1){
 		int admin_fd = open(admin_file, O_RDWR|O_CREAT, S_IRWXU);
 		Admin a;
@@ -125,16 +125,17 @@ int checkUser(int role, char login[20]){
 	else if(role == 3){
 		char *s = mystrncpy(login, 2); 
 		int loginID = atoi(s);
-		printf("LoginID: %d\n", loginID);
+		// printf("LoginID: %d\n", loginID);
 		int student_fd = open(student_file, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG);
 		Student tmp;
-		while(read(student_fd, &tmp, sizeof(tmp)))
-			printf("%d - ", tmp.ID);
+		while(read(student_fd, &tmp, sizeof(tmp))){
+			// printf("%d - ", tmp.ID);
 			if(loginID == tmp.ID && tmp.active){
 				close(student_fd);
 				return role;
 			}
-			printf("\n");
+			// printf("\n");
+		}
 		close(student_fd);
 	}
 	return -1;
@@ -221,7 +222,7 @@ int* mainMenu(){
 	char login[20];
 	printf("Enter login ID: "); scanf(" %[^\n]", login);
 	int flag = checkUser(role, login);
-	printf("Flag %d\n", flag);
+	// printf("Flag %d\n", flag);
 	if(flag == -1){
 		int *arr = calloc(2, sizeof(int));
 		arr[0] = flag; arr[1] = 0;
